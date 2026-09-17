@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>CODEX ALPHA OS</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#08080a">
+<style>
+:root{--bg:#08080a;--txt:#f5f5f7;--mut:rgba(235,235,245,.55);--red:#ff453a;--org:#ff9f0a;--grn:#30d158;--blu:#0a84ff;
+--glass:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.04));--stroke:rgba(255,255,255,.12);--stroke2:rgba(255,255,255,.06);
+--r:26px;--sb:env(safe-area-inset-bottom);--st:env(safe-area-inset-top);--ease:cubic-bezier(.22,.9,.28,1);
+--font:-apple-system,BlinkMacSystemFont,"SF Pro Display",Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--txt);font-family:var(--font);height:100vh;overflow:hidden;-webkit-font-smoothing:antialiased}
+.aurora{position:fixed;inset:0;z-index:-1;overflow:hidden}
+.aurora i{position:absolute;border-radius:50%;filter:blur(90px);opacity:.5}
+.b1{width:70vmax;height:70vmax;left:-25vmax;top:-30vmax;background:radial-gradient(circle,#ff453a,transparent 65%);animation:d1 26s ease-in-out infinite alternate}
+.b2{width:60vmax;height:60vmax;right:-20vmax;bottom:-25vmax;background:radial-gradient(circle,#ff9f0a,transparent 65%);animation:d2 32s ease-in-out infinite alternate}
+.b3{width:45vmax;height:45vmax;left:20vmax;top:35vmax;background:radial-gradient(circle,#ff375f,transparent 65%);opacity:.3;animation:d3 22s ease-in-out infinite alternate}
+@keyframes d1{to{transform:translate(12vmax,8vmax) scale(1.15)}}@keyframes d2{to{transform:translate(-10vmax,-6vmax) scale(1.1)}}@keyframes d3{to{transform:translate(8vmax,-10vmax) scale(.9)}}
+header{padding:calc(var(--st) + 12px) 20px 8px;display:flex;justify-content:space-between;align-items:center}
+header h1{margin:0;font-size:17px;font-weight:800;letter-spacing:3px}
+header h1 em{font-style:normal;color:var(--red)}
+.pill{background:rgba(255,255,255,.08);border:1px solid var(--stroke2);border-radius:999px;padding:6px 12px;font-size:11px;font-weight:600;color:var(--mut)}
+main{height:100%;overflow-y:auto;padding:4px 16px calc(110px + var(--sb));-webkit-overflow-scrolling:touch}
+main::-webkit-scrollbar{display:none}
+.view{display:none}.view.on{display:block;animation:up .45s var(--ease)}
+@keyframes up{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.g{background:var(--glass);backdrop-filter:blur(28px) saturate(160%);-webkit-backdrop-filter:blur(28px) saturate(160%);border:1px solid var(--stroke);border-radius:var(--r);padding:18px;margin-bottom:14px}
+.g.soft{background:rgba(255,255,255,.05);backdrop-filter:blur(14px);border-radius:20px;padding:14px}
+.lbl{font-size:10px;font-weight:800;letter-spacing:1.6px;color:var(--mut);text-transform:uppercase}
+.lbl.red{color:var(--red)}.lbl.grn{color:var(--grn)}.lbl.org{color:var(--org)}.lbl.blu{color:var(--blu)}
+.huge{font-size:52px;font-weight:800;letter-spacing:-3px;line-height:1;margin:6px 0 2px}
+.huge small{font-size:14px;font-weight:700;color:var(--mut);letter-spacing:0}
+.sub{font-size:12px;color:var(--mut);line-height:1.5}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{width:100%;border:0;border-radius:16px;padding:15px;font-family:var(--font);font-size:14px;font-weight:800;letter-spacing:.4px;cursor:pointer;transition:transform .12s var(--ease);display:flex;align-items:center;justify-content:center;gap:8px}
+.btn:active{transform:scale(.96)}
+.btn.red{background:linear-gradient(135deg,#ff453a,#ff375f);color:#fff;box-shadow:0 6px 24px rgba(255,69,58,.35)}
+.btn.wht{background:rgba(255,255,255,.92);color:#111}
+.btn.gho{background:rgba(255,255,255,.08);color:var(--txt);border:1px solid var(--stroke2)}
+.btn.sm{padding:11px;font-size:12px;border-radius:12px}
+.row{display:flex;gap:8px}.row>*{flex:1}
+.ck{display:flex;gap:12px;align-items:flex-start;padding:11px 2px;border-bottom:1px solid var(--stroke2);cursor:pointer}
+.ck:last-child{border-bottom:0}
+.ck .box{width:24px;height:24px;flex:none;border-radius:50%;border:2px solid rgba(255,255,255,.25);display:grid;place-items:center;transition:all .25s var(--ease)}
+.ck.done .box{background:var(--grn);border-color:var(--grn)}
+.ck.done .box:after{content:"✓";font-size:13px;font-weight:900;color:#062b12}
+.ck.done .tx{color:var(--mut);text-decoration:line-through}
+.ck .tm{font-size:11px;font-weight:800;color:var(--org);min-width:56px;font-variant-numeric:tabular-nums}
+.ck .tx{font-size:14px;font-weight:600;line-height:1.35}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 10px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--stroke2);background:rgba(255,255,255,.06);color:var(--mut);border-radius:999px;padding:9px 15px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font)}
+.chip.on{background:var(--txt);color:#111;border-color:var(--txt)}
+.scene{perspective:1400px;height:300px;margin:4px 0 14px}
+.fcard{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform .65s var(--ease);cursor:pointer}
+.fcard.flip{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;border-radius:var(--r);display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:24px;border:1px solid var(--stroke);overflow-y:auto}
+.face.f{background:var(--glass);backdrop-filter:blur(28px)}
+.face.b{background:linear-gradient(150deg,rgba(255,69,58,.30),rgba(255,55,95,.14)),rgba(20,10,10,.6);backdrop-filter:blur(28px);transform:rotateY(180deg);border-color:rgba(255,69,58,.4)}
+.fq{font-size:22px;font-weight:800}
+.fa{font-size:14.5px;line-height:1.55;font-weight:600}
+.hint{position:absolute;bottom:12px;font-size:9px;font-weight:800;letter-spacing:2px;color:var(--mut)}
+.prog{height:5px;border-radius:3px;background:rgba(255,255,255,.1);overflow:hidden;margin:8px 0 2px}
+.prog i{display:block;height:100%;background:linear-gradient(90deg,var(--red),var(--org));transition:width .5s var(--ease)}
+details{background:var(--glass);backdrop-filter:blur(20px);border:1px solid var(--stroke2);border-radius:20px;margin-bottom:10px;overflow:hidden}
+summary{list-style:none;padding:15px 18px;font-size:14px;font-weight:800;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+summary::-webkit-details-marker{display:none}
+summary:after{content:"+";color:var(--red);font-size:20px;font-weight:700}
+details[open] summary:after{content:"–"}
+details .in{padding:2px 18px 16px;border-top:1px solid var(--stroke2);font-size:13px;line-height:1.6}
+details h4{margin:14px 0 6px;font-size:11px;font-weight:800;letter-spacing:1.4px;color:var(--org);text-transform:uppercase}
+details h5{margin:10px 0 4px;font-size:12px;font-weight:800;color:var(--txt)}
+details ul{margin:6px 0;padding-left:18px}
+details li{margin:5px 0}
+details b{color:var(--txt)}
+details .w{color:var(--org);font-weight:700}
+details .r{color:var(--red);font-weight:700}
+details .g2{color:var(--grn);font-weight:700}
+table{width:100%;border-collapse:collapse;font-size:12px;margin:8px 0}
+th,td{border-bottom:1px solid var(--stroke2);padding:6px 5px;text-align:left;vertical-align:top}
+th{color:var(--mut);font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.6px}
+pre{background:rgba(0,0,0,.35);border:1px solid var(--stroke2);border-radius:12px;padding:10px;font-size:10.5px;line-height:1.5;overflow-x:auto;font-family:ui-monospace,Menlo,Consolas,monospace;color:rgba(245,245,247,.85)}
+.lr{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:11px 2px;border-bottom:1px solid var(--stroke2);font-size:13.5px;font-weight:600}
+.lr:last-child{border-bottom:0}
+.lr .d{font-variant-numeric:tabular-nums;font-size:11px;font-weight:800;color:var(--org);min-width:56px}
+.tag{font-size:9px;font-weight:800;padding:4px 8px;border-radius:999px;letter-spacing:.8px}
+.tag.wr{background:rgba(255,69,58,.18);color:var(--red)}.tag.ok{background:rgba(48,209,88,.16);color:var(--grn)}.tag.wo{background:rgba(255,159,10,.18);color:var(--org)}
+input,select{width:100%;background:rgba(0,0,0,.35);border:1px solid var(--stroke2);color:var(--txt);border-radius:14px;padding:13px;font-size:16px;font-family:var(--font);margin-bottom:10px;outline:none}
+label{display:block;font-size:10px;font-weight:800;letter-spacing:1.4px;color:var(--mut);margin:0 0 5px 4px;text-transform:uppercase}
+nav{position:fixed;bottom:calc(14px + var(--sb));left:50%;transform:translateX(-50%);width:min(94vw,430px);background:rgba(18,18,20,.72);backdrop-filter:blur(30px) saturate(180%);border:1px solid var(--stroke);border-radius:999px;display:flex;padding:6px;z-index:60;box-shadow:0 12px 40px rgba(0,0,0,.6)}
+nav button{flex:1;border:0;background:transparent;color:var(--mut);border-radius:999px;padding:10px 0 8px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:9px;font-weight:800;letter-spacing:.6px;cursor:pointer;font-family:var(--font);transition:all .3s var(--ease)}
+nav button svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+nav button.on{background:rgba(255,255,255,.14);color:var(--txt)}
+.ovl{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(12px);z-index:100;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
+.ovl.on{opacity:1;pointer-events:auto}
+.sheet{width:100%;max-width:520px;background:rgba(24,14,14,.92);backdrop-filter:blur(30px);border:1px solid rgba(255,69,58,.35);border-bottom:0;border-radius:32px 32px 0 0;padding:26px 22px calc(30px + var(--sb));transform:translateY(100%);transition:transform .45s var(--ease);max-height:88vh;overflow-y:auto}
+.ovl.on .sheet{transform:none}
+.sheet h2{margin:0 0 4px;font-size:20px;font-weight:800;color:var(--red);letter-spacing:1px}
+.sheet h4{margin:16px 0 6px;font-size:11px;font-weight:800;letter-spacing:1.6px;color:var(--org);text-transform:uppercase}
+.sheet ul{margin:0;padding-left:18px}.sheet li{font-size:13px;line-height:1.7}
+</style>
+</head>
+<body>
+<div class="aurora"><i class="b1"></i><i class="b2"></i><i class="b3"></i></div>
+<header><h1>CODEX <em>ALPHA</em></h1><span class="pill" id="hdate">--</span></header>
+<main>
+
+<!-- ============ TODAY ============ -->
+<div class="view on" id="v-today">
+  <div class="g" style="border-color:rgba(255,69,58,.35)">
+    <span class="lbl red">PROCHAINE ACTION</span>
+    <div style="font-size:24px;font-weight:800;line-height:1.2;margin:8px 0 4px" id="na-label">…</div>
+    <div class="sub" id="na-sub"></div>
+    <div class="row" style="margin-top:10px" id="na-tags"></div>
+  </div>
+  <div class="grid2">
+    <div class="g soft"><span class="lbl red">FHG · 22.09</span><div class="huge" style="font-size:38px" id="cd-fhg">J-?</div></div>
+    <div class="g soft"><span class="lbl org">SCI · 24.09</span><div class="huge" style="font-size:38px" id="cd-sci">J-?</div></div>
+  </div>
+  <div class="g"><div class="row" style="margin-bottom:6px"><span class="lbl">PROTOCOLE DU JOUR</span><span class="lbl org" id="dtype"></span></div><div id="tasks"></div></div>
+  <div class="grid2">
+    <div class="g soft"><span class="lbl">NET WORTH</span><div class="huge" style="font-size:28px" id="s-nw">582€</div><div class="sub">DCA 100€/mois</div></div>
+    <div class="g soft"><span class="lbl grn">SGS ENCAISSÉ</span><div class="huge" style="font-size:28px;color:var(--grn)" id="s-sgs">0€</div><div class="sub">cible 8 500€</div></div>
+  </div>
+  <div class="g soft"><div class="row" style="align-items:center"><span class="lbl">MAÎTRISE FHG+SCI</span><span class="lbl grn" id="m-pct">0%</span></div><div class="prog"><i id="m-bar" style="width:0%"></i></div><div class="sub" style="margin-top:6px" id="m-txt"></div></div>
+  <button class="btn red" onclick="app.decisa(1)">⚠ PROTOCOLE DECISA · FAILSAFE 72H</button>
+</div>
+
+<!-- ============ RÉVISER ============ -->
+<div class="view" id="v-rev">
+  <div class="chips" id="deck-chips"></div>
+  <div class="scene"><div class="fcard" id="fcard" onclick="app.flip()">
+    <div class="face f"><span class="lbl red" id="f-cat"></span><div class="fq" id="f-q" style="margin-top:10px"></div><div class="hint">TOUCHER · RÉVÉLER</div></div>
+    <div class="face b"><div class="fa" id="f-a"></div></div>
+  </div></div>
+  <div class="row"><button class="btn gho" onclick="app.next(false)">À REVOIR</button><button class="btn wht" onclick="app.next(true)">ACQUIS</button></div>
+  <div class="prog" style="margin-top:12px"><i id="f-bar" style="width:0%"></i></div>
+  <div class="sub" style="text-align:center;margin-top:6px" id="f-prog"></div>
+  <div class="g soft" style="margin-top:12px"><span class="lbl">RÈGLE D'OR</span><div class="sub" style="margin-top:6px">10 cartes = 3 minutes. Les cartes « à revoir » reviennent en premier. Entre deux cours, dans le bus, avant de dormir.</div></div>
+</div>
+
+<!-- ============ AGENDA ============ -->
+<div class="view" id="v-agd">
+  <div class="g"><span class="lbl">AJOUTER UN ÉVÉNEMENT</span><div style="margin-top:10px"></div>
+    <label>Type</label><select id="ev-type"><option value="WORK">TRAVAIL · ITM / MISSION</option><option value="SGS">SGS · HOSPITALISATION</option><option value="CLASS">COURS · ILM</option><option value="DEEP">DEEP WORK</option><option value="REST">REPOS</option></select>
+    <label>Date</label><input type="date" id="ev-date">
+    <label>Note (heures, lieu)</label><input type="text" id="ev-note" placeholder="ex : 13:00-19:15 Tinlot">
+    <button class="btn wht" onclick="app.addEv()">AJOUTER AU PLANNING</button>
+  </div>
+  <div class="g"><span class="lbl">À VENIR · FUSION SGS + PERSO</span><div id="agd-list" style="margin-top:6px"></div></div>
+  <div class="g soft"><span class="lbl">SEMAINE TYPE · ILM LIÈGE</span>
+    <div class="lr"><span class="d">LUN</span><span>NL 9-12 (722) · EN 12:15-17 (717)</span></div>
+    <div class="lr"><span class="d">MAR-VEN</span><span>NL/EN alterné 9-13 · DW2 14-16</span></div>
+    <div class="lr"><span class="d">SAM</span><span>DW 3h · missions · meal prep</span></div>
+    <div class="lr"><span class="d">DIM</span><span>Revue KPI 10-12 · récupération</span></div>
+  </div>
+</div>
+
+<!-- ============ CODEX (FICHES INTÉGRALES) ============ -->
+<div class="view" id="v-cdx">
+
+<details><summary>📐 MÉTHODE FHG · CRITIQUER + SYNTHÉTISER</summary><div class="in">
+<h4>L'épreuve du 22 septembre</h4>
+<ul><li>Écrit, <b>3 heures pour histoire ET géographie</b>. Les deux dossiers et questionnaires remis au début : tu répartis ton temps. Pas de brouillon, pas de tipp-ex, pas d'atlas. Tout se construit sur le questionnaire.</li>
+<li><b>Barème histoire :</b> critiquer pertinence /10 · critiquer fiabilité /16 · synthétiser /45 → /71 → /20. <span class="r">La synthèse = 63% de la note.</span></li>
+<li><b>Plan de temps :</b> 5 min lire les 2 questionnaires · 35 min critique · 60 min synthèse (plan 10, rédaction 45, relecture 5) · 70 min géo · 10 min relecture finale.</li></ul>
+<h4>⚠ Les 3 règles qui coûtent le plus cher</h4>
+<ul><li><span class="r">1.</span> La critique se fait <b>à partir du corpus seul</b>, sans connaissances préalables. La synthèse, elle, <b>exige des savoirs extérieurs</b> : 45 points en dépendent.</li>
+<li><span class="r">2.</span> Chaque élément de la synthèse <b>cite son document</b> : « (doc. 4) ». Le barème 2025-2026/1 ne comptait pas un élément sans source citée.</li>
+<li><span class="r">3.</span> L'introduction contient <b>au moins deux éléments de contexte historique</b> (barème 2025-2026/1 : sinon 0 sur cette partie).</li></ul>
+<h4>1 · Critiquer la pertinence (/10)</h4>
+<ul><li>Un document est pertinent s'il permet de répondre à la problématique. 4 étapes toujours identiques : <b>(1)</b> problématique → thème ? lieu ? date ? · <b>(2)</b> chaque document → thème ? lieu ? date des faits ? · <b>(3)</b> comparer : les 3 variables concordent ? · <b>(4)</b> conclure : pertinent / non pertinent + la variable qui décide.</li></ul>
+<table><tr><th>Doc.</th><th>Thème</th><th>Lieu</th><th>Date des faits</th><th>Pertinent ? Pourquoi</th></tr>
+<tr><td>3</td><td>conditions de travail des mineurs</td><td>Borinage (BE)</td><td>1880</td><td>Oui : les 3 variables correspondent</td></tr>
+<tr><td>7</td><td>krach boursier</td><td>New York</td><td>1929</td><td>Non : la date sort de la période (XIXᵉ s.)</td></tr></table>
+<h5>Phrases-types</h5>
+<ul><li>« Le document 3 est pertinent : il porte sur [thème], en [lieu], en [date], ce qui correspond à la problématique qui étudie […]. »</li>
+<li>« Le document 7 n'est pas pertinent : s'il traite bien de [thème], il concerne [autre date/lieu], alors que la problématique porte sur […]. »</li></ul>
+<h5>⚠ Pièges signalés par le Jury</h5>
+<ul><li>Le <b>titre d'un ouvrage n'est pas un thème</b>. « Histoire de la Belgique » ne dit rien du thème du document.</li>
+<li><b>Date de réalisation ≠ date des faits</b>. Un historien écrivant en 2010 sur 1929 est pertinent pour 1929.</li>
+<li>Delacroix (1830) ou un graphique de 1929 échouent sur la variable date dans un dossier sur la révolution industrielle.</li></ul>
+<h4>2 · Critiquer la fiabilité (/16)</h4>
+<ul><li>On attend <b>une raison de faire confiance et une raison de se méfier par document</b>. Chaque raison s'appuie sur un élément du corpus : si le dossier ne donne ni auteur ni date, on raisonne sur le contenu, c'est prévu.</li></ul>
+<table><tr><th>Sur l'auteur</th><th>Sur le document</th></tr>
+<tr><td>Contemporain des faits ? Témoin direct ? Compétent (historien, spécialiste) ? Objectif ou partisan ? Informe ou persuade un public cible ? Veut-il critiquer, nuire ?</td>
+<td>Date de l'époque des faits ? Manuel, musée, institution réputée ? Recoupé par un autre document du corpus ? Caricature (exagère, fait rire) ? Reconstitution, copie conforme ? Site internet peu connu, sans sources ?</td></tr></table>
+<ul><li><b>Trois écarts à estimer (programme) :</b> entre le contenu et la réalité connue par ailleurs (témoignage) · entre les intentions et la réalisation (programme politique, discours) · l'existence d'autres points de vue.</li></ul>
+<h5>Réflexes par type de document</h5>
+<table><tr><th>Type</th><th>Faire confiance parce que…</th><th>Se méfier parce que…</th></tr>
+<tr><td>Témoignage</td><td>témoin direct, détails précis</td><td>subjectif, mémoire tardive, cas individuel</td></tr>
+<tr><td>Caricature</td><td>révèle l'opinion d'un camp à une date</td><td>exagère volontairement, vise à ridiculiser</td></tr>
+<tr><td>Affiche de propagande</td><td>montre ce qu'un pouvoir veut faire croire</td><td>vise à persuader, un seul point de vue</td></tr>
+<tr><td>Discours, programme</td><td>intentions officielles, datées</td><td>intentions ≠ réalisations</td></tr>
+<tr><td>Statistique, graphique</td><td>chiffré, souvent institutionnel</td><td>source ? définitions ? période choisie ?</td></tr>
+<tr><td>Photographie</td><td>trace de l'époque</td><td>cadrage, mise en scène, légende orientée</td></tr>
+<tr><td>Texte d'historien, manuel</td><td>recul, recherche, recoupements</td><td>interprétation d'un auteur, date de rédaction</td></tr>
+<tr><td>Loi, traité</td><td>texte officiel exact</td><td>dit ce qui doit être, pas ce qui a été appliqué</td></tr></table>
+<ul><li><span class="r">⚠ « Carte d'identité stéréotypée » : zéro point.</span> Réciter « auteur, date, nature » sans rien en conclure ne rapporte rien. Chaque élément doit devenir un argument : « l'auteur est ministre du gouvernement qui a voté la loi : il a intérêt à la présenter comme un succès ».</li></ul>
+<h5>Phrases-types</h5>
+<ul><li>« On peut faire confiance à ce document, car son auteur, X, est un témoin direct des faits (il était mineur à Charleroi en 1886). »</li>
+<li>« On doit toutefois s'en méfier : il s'agit d'une affiche du parti Y, destinée à convaincre les électeurs, qui ne présente qu'un point de vue. »</li></ul>
+<h4>3 · Synthétiser (/45)</h4>
+<ul><li><b>Structure imposée :</b> Titre = thème + lieu + époque (ex. : <i>La marche vers la Seconde Guerre mondiale en Europe, 1933-1939</i>). Introduction : accroche · contexte (≥ 2 éléments) · rappel problématique · annonce du plan. Développement : un paragraphe = une idée, avec alinéa ; chaque paragraphe combine documents cités + savoirs extérieurs. Conclusion : répond à la problématique, puis ouverture si possible.</li></ul>
+<h5>Les 5 opérations à mettre en évidence (compétence 3)</h5>
+<table><tr><th>Opération</th><th>Définition</th><th>Exemple</th></tr>
+<tr><td>Permanence</td><td>ce qui ne change pas sur la période</td><td>domination politique de la bourgeoisie au XIXᵉ s.</td></tr>
+<tr><td>Processus évolutif</td><td>transformation progressive</td><td>élargissement du droit de vote en BE : 1831 → 1893 → 1919 → 1948</td></tr>
+<tr><td>Changement (rupture)</td><td>transformation brutale</td><td>krach d'octobre 1929 ; Hitler chancelier le 30/01/1933</td></tr>
+<tr><td>Synchronisme</td><td>faits simultanés en des lieux différents</td><td>la crise frappe USA, Allemagne, Belgique en 1930-1932</td></tr>
+<tr><td>Hypothèse explicative</td><td>une cause proposée et argumentée</td><td>le chômage de masse (6 M en 1932) aide l'ascension du parti nazi</td></tr></table>
+<ul><li><b>Plans possibles :</b> chronologique (étapes d'une évolution) · thématique (causes/manifestations/conséquences, ou politique/économique/social) · mixte. Choisis celui que la problématique appelle.</li>
+<li><b>Gabarit de paragraphe :</b> idée principale (1 phrase) → preuve tirée d'un document « (doc. 5) » → savoir extérieur (date, chiffre, notion) → conséquence ou lien avec la problématique.</li>
+<li><b>Connecteurs :</b> cause : car, en effet, en raison de · conséquence : donc, c'est pourquoi, par conséquent · opposition : cependant, en revanche, alors que · ajout : de plus, en outre · temps : d'abord, ensuite, dès lors, finalement.</li></ul>
+<h5>Les 11 critères de correction (à cocher à la relecture)</h5>
+<ul><li>☐ un titre · ☐ l'objet de la recherche respecté (temps, espace, thème) · ☐ aucune information inutile · ☐ compréhensible et sensé · ☐ informations des documents ET des savoirs · ☐ pas un simple résumé des documents · ☐ pas d'erreur dans les savoirs · ☐ organisation logique des paragraphes · ☐ une idée principale par paragraphe · ☐ écriture lisible, paragraphes distincts, pas de ratures · ☐ aucun passage complet recopié des documents.</li></ul>
+<h4>4 · Autres formats de restitution</h4>
+<ul><li><b>Ligne du temps :</b> axe orienté (flèche), échelle régulière et juste, titre complet (thème, espace, époque), périodes (barres) distinguées des événements (points), légende si couleurs.</li>
+<li><b>Schéma :</b> identifier les éléments puis les relations : causes → fait → conséquences. Mots-clés dans des cadres, flèches, légende. Brouillon sur le questionnaire.</li>
+<li><b>Tableau comparatif :</b> objets en colonnes, critères en lignes (idéologie, économie, chef, moyens…). Mots-clés, pas de phrases. Titre complet.</li></ul>
+</div></details>
+
+<details><summary>🏛 HISTOIRE · THÈME 1 · BASES DU MONDE CONTEMPORAIN</summary><div class="in">
+<h4>1.1 Démographie et migrations</h4>
+<ul><li><b>Transition démographique :</b> passage d'un régime natalité+mortalité élevées à un régime basses. Entre les deux, la mortalité baisse la première → la population explose. Phases : 1 régime ancien · 2 mortalité recule (hygiène, médecine, alimentation) · 3 natalité recule (urbanisation, instruction, contraception) · 4 régime moderne. Europe N-O : avant ±1750 / ±1750-1880 / ±1880-1950 / après 1950. Afrique subsaharienne aujourd'hui : fin phase 2, début phase 3.</li>
+<li>Europe : ±190 M hab. vers 1800 → +400 M en 1900. Belgique : ±3,8 M en 1830 → 7,4 M en 1910.</li>
+<li><b>Recul de la mortalité :</b> progrès agricoles (moins de famines), hygiène, vaccination (Jenner 1796), médecine (Pasteur), eau potable.</li>
+<li><b>Exode rural / urbanisation :</b> paysans vers villes industrielles (Liège, Charleroi, Gand, Verviers) ; villes autour des bassins charbonniers et du textile.</li>
+<li><b>Émigration européenne :</b> 1815-1914, 50-60 M d'Européens, surtout vers les Amériques. Répulsifs : pauvreté, famine (Irlande 1845-49), persécutions. Attractifs : terres, emplois, liberté. Belges vers USA ; saisonniers flamands en France.</li></ul>
+<h4>1.2 Industrialisation et capitalisme</h4>
+<table><tr><th></th><th>1ʳ rév. ind. (fin XVIIIᵉ)</th><th>2ᵉ rév. ind. (1870-1914)</th></tr>
+<tr><td>Énergie</td><td>charbon, vapeur</td><td>électricité, pétrole</td></tr>
+<tr><td>Secteurs</td><td>textile, charbonnages, sidérurgie, chemin de fer</td><td>chimie, acier, automobile, électricité</td></tr>
+<tr><td>Organisation</td><td>usine, manufacture</td><td>grandes entreprises, concentration (trusts, cartels), travail à la chaîne (taylorisme, fordisme : Ford T, chaîne 1913)</td></tr></table>
+<ul><li><b>Belgique, 1er pays industrialisé du continent :</b> Cockerill à Seraing (1817), Bauwens (textile gantois), sillon Haine-Sambre-Meuse, Société Générale (1822), train Bruxelles-Malines (1835), Gramme (dynamo 1869), Solvay (chimie 1863).</li>
+<li><b>Capitalisme :</b> propriété privée des moyens de production, recherche du profit, libre concurrence, salariat. Libéralisme économique (Adam Smith, <i>La Richesse des nations</i>, 1776) : État « gendarme ». Crises cycliques (longue dépression 1873-1895).</li></ul>
+<h4>1.3 La société industrielle</h4>
+<ul><li><b>Bourgeoisie :</b> grande (industriels, banquiers), moyenne, petite. Valeurs : travail, épargne, propriété, instruction, famille. Domine la politique via suffrage censitaire (1831 : ±1% vote).</li>
+<li><b>Prolétariat :</b> journées 12-14 h, bas salaires, travail femmes/enfants (hiercheuses), accidents (grisou), corons insalubres, choléra, alcoolisme, aucune protection, livret ouvrier.</li>
+<li><b>Question sociale :</b> paternalisme (Grand-Hornu) · organisation ouvrière (mutualités, coopératives Vooruit à Gand, syndicats, Maison du Peuple Horta 1899, POB 1885) · luttes (émeutes/grèves mars 1886 Wallonie réprimées ; grève générale 1893).</li>
+<li><b>Législation sociale BE :</b> 1889 enfants (interdit &lt;12 ans industrie) · 1903 accidents · 1905 repos dominical · 1921 8 h + liberté syndicale.</li>
+<li><b>Droit de vote :</b> 1831 censitaire → 1893 universel masculin tempéré vote plural (1-3 voix) → 1919 universel masculin pur → 1921 communal femmes → 1948 universel féminin (1er vote législatif 1949).</li></ul>
+<h4>1.4 Courants idéologiques</h4>
+<table><tr><th>Courant</th><th>Idées clés</th><th>État</th><th>Moyens</th><th>Repères</th></tr>
+<tr><td>Libéralisme</td><td>libertés, propriété, constitution</td><td>limité (« gendarme »)</td><td>réformes légales</td><td>A. Smith ; Parti libéral 1846</td></tr>
+<tr><td>Conservatisme cath.</td><td>ordre, tradition, religion</td><td>protège ordre/Église</td><td>parti, école libre</td><td>au pouvoir 1884-1914</td></tr>
+<tr><td>Socialisme réformiste</td><td>égalité, justice sociale</td><td>intervient, protège</td><td>suffrage, syndicats, lois</td><td>POB 1885, Charte Quaregnon 1894</td></tr>
+<tr><td>Marxisme</td><td>lutte des classes, abolir propriété privée</td><td>dictature prolétariat</td><td>révolution</td><td>Manifeste 1848, Le Capital 1867</td></tr>
+<tr><td>Anarchisme</td><td>abolir État/autorité</td><td>aucun</td><td>action directe</td><td>Proudhon, Bakounine</td></tr>
+<tr><td>Doctrine sociale Église</td><td>ni libéralisme sauvage ni lutte des classes</td><td>arbitre</td><td>associations chrétiennes</td><td>Rerum Novarum 1891, abbé Daens</td></tr>
+<tr><td>Nationalisme</td><td>nation au-dessus de tout</td><td>État-nation</td><td>unification, indépendance</td><td>Italie 1861, Allemagne 1871</td></tr></table>
+<h4>Pour la synthèse</h4>
+<ul><li>Permanences : domination bourgeoisie ; poids du monde paysan jusqu'au milieu du siècle. Processus : démocratisation du suffrage (1831→1948) ; législation sociale progressive. Changements : machine à vapeur ; 1886 ; 1893. Synchronismes : industrialisation décalée ; révolutions de 1848. Hypothèse : misère ouvrière → essor socialisme/syndicats ; pression des grèves → réformes électorales.</li>
+<li><span class="w">Pièges :</span> libéralisme politique ≠ libéralisme économique · vote plural (1893) ≠ suffrage universel pur (1919) · socialisme réformiste ≠ communisme révolutionnaire.</li></ul>
+</div></details>
+
+<details><summary>🌍 HISTOIRE · THÈME 2 · IMPÉRIALISME</summary><div class="in">
+<h4>2.1 Définitions</h4>
+<table><tr><th>Terme</th><th>Définition</th></tr>
+<tr><td>Colonisation</td><td>un État s'empare d'un territoire étranger, le peuple (parfois), l'administre, l'exploite</td></tr>
+<tr><td>Impérialisme</td><td>volonté d'étendre sa domination (politique, éco, culturelle), avec ou sans occupation</td></tr>
+<tr><td>Colonie</td><td>territoire administré directement par la métropole</td></tr>
+<tr><td>Protectorat</td><td>l'État garde ses institutions mais la puissance contrôle diplomatie, armée, éco (Maroc, Tunisie)</td></tr>
+<tr><td>Dominion</td><td>colonie de peuplement très autonome (Canada, Australie)</td></tr>
+<tr><td>Zone d'influence</td><td>domination économique sans annexion (Chine)</td></tr>
+<tr><td>Métropole</td><td>la puissance colonisatrice</td></tr></table>
+<h4>2.2 Pourquoi coloniser (1870-1914)</h4>
+<ul><li><b>Économiques :</b> matières premières (caoutchouc, coton, cuivre), débouchés, placements de capitaux ; pendant la dépression 1873-1895, marchés protégés. Lénine : « stade suprême du capitalisme » (1916).</li>
+<li><b>Politiques/stratégiques :</b> prestige, puissance, escales pour la flotte, rivalités ; la France cherche compensation après 1870.</li>
+<li><b>Idéologiques :</b> « mission civilisatrice » (Jules Ferry 1885), évangélisation, darwinisme social, racisme « scientifique », « fardeau de l'homme blanc » (Kipling 1899).</li>
+<li><b>Techniques :</b> quinine, navires à vapeur, armes modernes, télégraphe.</li></ul>
+<h4>2.3 Le partage du monde</h4>
+<ul><li><b>Conférence de Berlin (15/11/1884-26/02/1885) :</b> règles du partage (occupation effective, notification), liberté de commerce bassin du Congo et navigation Congo/Niger. Elle ne découpe pas l'Afrique mais la reconnaissance de l'EIC en découle.</li>
+<li>Afrique : ±10% colonisé en 1880 → 90% en 1914. Indépendants : Éthiopie (Adoua 1896) et Liberia.</li>
+<li>Asie : Inde britannique, Indochine française, Indes néerlandaises ; Chine ouverte de force (opium, traités inégaux, zones d'influence, Boxers 1900). Plus grands empires : britannique (¼ des terres émergées), puis français.</li></ul>
+<h4>2.4 Formes de domination</h4>
+<table><tr><th>Domaine</th><th>Formes</th></tr>
+<tr><td>Politique</td><td>directe (France : assimilation) ou indirecte (RU : indirect rule) ; colonisés sans droits de citoyens</td></tr>
+<tr><td>Économique</td><td>pacte colonial : matières premières → métropole ; cultures obligatoires, monoculture, travail forcé, impôt</td></tr>
+<tr><td>Culturelle</td><td>langue/école de la métropole, missions, dévalorisation des cultures locales</td></tr>
+<tr><td>Sociale</td><td>hiérarchie raciale, ségrégation (Code de l'indigénat 1881), « évolués » au Congo</td></tr></table>
+<h4>2.5 Le Congo : du roi à la Belgique</h4>
+<ul><li>1876 Association internationale africaine · 1879-84 Stanley signe des traités · <b>1885 EIC = propriété personnelle de Léopold II</b> · 1890-1905 boom caoutchouc (pneu Dunlop 1888) : récoltes forcées, otages, mains coupées, chute démographique · 1904 rapport Casement, campagne Morel · <b>1908 la Belgique reprend le Congo (15/11)</b>.</li>
+<li>Charte coloniale 1908 : Parlement contrôle ; ministre des Colonies + gouverneur général. « Trinité coloniale » : État, missions, grandes sociétés (Union minière du Haut-Katanga 1906 : cuivre, cobalt, uranium Shinkolobwe). Paternalisme : santé/enseignement primaire mais pas d'élite (Lovanium 1954). <i>Tintin au Congo</i> (1931) = vision paternaliste (outil 18).</li></ul>
+<h4>2.6 Choc des impérialismes et nationalismes</h4>
+<ul><li>Rivalités : Fachoda 1898 (FR/RU) ; crises marocaines 1905 (Tanger), 1911 (Agadir) FR/ALL ; guerre des Boers 1899-1902.</li>
+<li>Nationalismes : revanchisme français (Alsace-Lorraine 1871), pangermanisme, panslavisme, nationalités d'Autriche-Hongrie, Balkans « poudrière » (Bosnie 1908, guerres balkaniques 1912-13).</li>
+<li>Alliances : <b>Triple-Entente 1907</b> (FR, RU, Russie ; alliance franco-russe 1892-94, Entente cordiale 1904) face à <b>Triple-Alliance 1882</b> (ALL, A-H, Italie ; change de camp 1915). Belgique neutre (traité Londres 1839).</li></ul>
+<h4>Pour la synthèse</h4>
+<ul><li>Permanence : pacte colonial, hiérarchie colonisateur/colonisé. Processus : conquête Afrique 10%→90% (1880-1914). Changements : Berlin 1885 ; reprise Congo 1908. Synchronisme : partage Afrique + tensions Europe. Hypothèse : industrialisation → besoins matières premières/débouchés → expansion ; rivalités coloniales préparent 1914.</li>
+<li><span class="w">Pièges :</span> EIC (1885-1908) n'est pas une colonie belge · impérialisme ≠ colonisation (dominer sans occuper) · Berlin fixe des règles, ne trace pas toutes les frontières.</li></ul>
+</div></details>
+
+<details><summary>💥 HISTOIRE · THÈME 3 · 1914-1945</summary><div class="in">
+<h4>3.1 Première Guerre mondiale</h4>
+<ul><li>Causes profondes : nationalismes, rivalités impérialistes, course aux armements, alliances. Cause immédiate : attentat de Sarajevo (28/06/1914). Engrenage : A-H → Serbie (28/07), ALL → Russie (01/08) et France (03/08).</li>
+<li><b>Belgique :</b> ultimatum 02/08 → invasion 04/08 (plan Schlieffen) → RU en guerre. Forts de Liège ; atrocités (Dinant, Louvain, ±5 500 civils) ; Yser (oct. 1914, inondation) ; Albert Ier sur l'Yser. Occupation : réquisitions, déportations 1916-17, Flamenpolitik (université Gand 1916). Ypres : premiers gaz (22/04/1915).</li>
+<li>Phases : mouvement (1914, Marne) → tranchées (1915-17, Verdun/Somme 1916) → mouvement (1918) → armistice 11/11/1918. Guerre totale ; génocide arménien 1915. 1917 tournant : USA (avril), révolutions russes, Brest-Litovsk (03/1918). Bilan : ±10 M soldats tués, 4 empires finis, USA créanciers.</li>
+<li><b>Versailles (28/06/1919) :</b> art. 231 responsabilité, réparations (132 Md marks-or 1921), Alsace-Lorraine + colonies perdues, corridor Dantzig, armée 100 000, Rhénanie démilitarisée → « Diktat ». Nouveaux États ; SDN 1920 (sans USA). BE : Eupen-Malmedy 1920, mandat Ruanda-Urundi 1922, fin neutralité.</li></ul>
+<h4>3.2 Communisme en Russie</h4>
+<ul><li>Février 1917 : tsar abdique, double pouvoir (Kerenski / soviets). Octobre 1917 : bolcheviks par la force ; décrets paix/terre ; Constituante dissoute ; Tcheka ; parti unique. Guerre civile 1918-21 (Rouges vs Blancs) ; communisme de guerre. NEP 1921-28 (retour partiel marché). URSS 30/12/1922. Mort Lénine 01/1924.</li>
+<li><b>Stalinisme :</b> Gosplan, 1er plan quinquennal 1928-32 (industrie lourde) ; collectivisation forcée (kolkhozes, sovkhozes, dékoulakisation) ; famine 1932-33 (Holodomor) ; stakhanovisme 1935. Totalitaire : parti unique, culte, propagande (réalisme socialiste), NKVD, Grandes Purges 1936-38 (±680 000 exécutions), goulag, Constitution 1936 façade.</li></ul>
+<h4>3.3 Crise de 1929</h4>
+<ul><li>Chaîne : spéculation/surproduction → krach 24/10/1929 → faillites bancaires (±9 000) → crédit coupé → faillites → chômage (25% USA 1933) → déflation → propagation mondiale (Kreditanstalt 1931, protectionnisme) ; 6 M chômeurs ALL 1932.</li>
+<li>Réponses : orthodoxie libérale (aggrave) · New Deal 1933 (TVA, Social Security 1935) · Keynes 1936 (relance demande) · régimes autoritaires (autarcie, réarmement).</li>
+<li><b>Belgique :</b> chômage, grèves mineurs 1932 ; Plan du Travail (De Man 1933) ; Van Zeeland 1935 (dévaluation 28%) ; grève juin 1936 → congés payés, 40 h ; élections 24/05/1936 : Rex 21 sièges, VNV 16, communistes 9 ; 1937 Degrelle battu par Van Zeeland (union démocratique) ; neutralité oct. 1936.</li></ul>
+<h4>3.4 National-socialisme</h4>
+<ul><li>Contexte : défaite, « coup de poignard », Diktat, Weimar fragile, hyperinflation/Ruhr 1923, putsch Munich 1923 → Mein Kampf 1925. Ascension légale : 2,6% (1928) → 37,3% (07/1932) ; 30/01/1933 Hindenburg nomme Hitler chancelier.</li>
+<li>Dictature 1933-34 : Reichstag (27/02/33) → pleins pouvoirs (23/03/33) ; Dachau ; syndicats dissous ; parti unique ; Nuit des longs couteaux (30/06/34) ; Führer (08/34).</li>
+<li>Idéologie : racisme/antisémitisme, espace vital, Führerprinzip, antimarxisme/antilibéralisme, révision Versailles. Persécution : boycott 1933 → Nuremberg 15/09/1935 (perte citoyenneté) → Nuit de cristal 09-10/11/1938 (±30 000 arrêtés). Encadrement : Gestapo, SS, Goebbels, Jeunesses. Économie : autoroutes, réarmement 1935, autarcie 1936.</li>
+<li><b>Tableau totalitarismes :</b> fascisme (Mussolini 1922, nation/Rome, corporatisme) / nazisme (voie légale 1933, race/espace vital, capitalisme dirigé) / stalinisme (succession Lénine, classe, collectivisme). Points communs : parti unique, culte du chef, propagande, terreur, jeunesse encadrée, libertés niées, « homme nouveau ».</li></ul>
+<h4>3.5 Marche vers la guerre</h4>
+<table><tr><th>Date</th><th>Coup de force</th><th>Réaction démocraties</th></tr>
+<tr><td>10/1933</td><td>quitte la SDN</td><td>protestations</td></tr>
+<tr><td>03/1935</td><td>service militaire</td><td>condamnation verbale</td></tr>
+<tr><td>1935-36</td><td>Italie envahit Éthiopie</td><td>sanctions SDN inefficaces</td></tr>
+<tr><td>07/03/1936</td><td>Rhénanie</td><td>aucune riposte ; BE → neutralité</td></tr>
+<tr><td>1936-39</td><td>guerre d'Espagne (Guernica 1937)</td><td>non-intervention</td></tr>
+<tr><td>03/1938</td><td>Anschluss</td><td>aucune riposte</td></tr>
+<tr><td>29-30/09/1938</td><td>Munich : Sudètes cédés</td><td>apaisement</td></tr>
+<tr><td>03/1939</td><td>Bohême-Moravie</td><td>garanties à la Pologne</td></tr>
+<tr><td>23/08/1939</td><td>pacte germano-soviétique</td><td>stupeur</td></tr>
+<tr><td>01/09/1939</td><td>Pologne</td><td>guerre (03/09)</td></tr></table>
+<ul><li>Hypothèses : volonté nazie (Versailles, espace vital) · faiblesse SDN · apaisement (pacifisme, crise, peur communisme) · isolationnisme USA · méfiance démocraties/URSS.</li>
+<li><b>Repères guerre :</b> 10/05/1940 Ouest (18 jours) · 28/05/1940 capitulation armée BE (Léopold III prisonnier ; Pierlot à Londres) · 22/06/1941 URSS · 07/12/1941 Pearl Harbor · Stalingrad 02/02/1943 · 06/06/1944 Normandie · 09/1944 libération Bruxelles/Anvers · 12/1944 Ardennes · 08/05/1945 · Hiroshima/Nagasaki 06-09/08/1945. ±60 M morts.</li></ul>
+<h4>3.6 Univers concentrationnaire et génocide</h4>
+<ul><li>Camps de concentration (dès 1933 : Dachau, Buchenwald, Ravensbrück, Mauthausen…) : opposants, résistants, Juifs, Roms, homosexuels, Témoins de Jéhovah. Travail forcé, faim, expériences.</li>
+<li>Centres de mise à mort (1942-44, Pologne) : Chełmno, Bełżec, Sobibór, Treblinka, Majdanek, Auschwitz-Birkenau (±1,1 M victimes dont 1 M Juifs). Zyklon B.</li>
+<li><b>Étapes Shoah :</b> exclusion légale 1933-39 → ghettos 1939-41 (Varsovie 04/1943) → Shoah par balles (Babi Yar 09/1941 : 33 000 en 2 jours) → Wannsee 20/01/1942 (« solution finale ») → déportations → marches de la mort → libération Auschwitz 27/01/1945. ±6 M Juifs ; Roms/Sintis ; programme T4.</li>
+<li><b>Belgique :</b> registre 1940, étoile 06/1942, rafles Anvers/Bruxelles 1942 ; Dossin Malines : 28 convois, 25 000 Juifs + 350 Roms, ±1 200 survivants ; XXe convoi 19/04/1943 (unique en Europe) ; Breendonk ; CDJ cache des milliers d'enfants. Après : Nuremberg 1945-46 ; Lemkin « génocide » 1944 ; convention ONU 1948 ; loi BE 23/03/1995 négationnisme.</li></ul>
+<h4>3.7 Collaboration / résistance</h4>
+<table><tr><th>Collaboration</th><th>Résistance</th></tr>
+<tr><td>VNV, DeVlag, Rex ; Légion Wallonie/flamande, Waffen-SS ; entreprises (doctrine Galopin : produire sans armes) ; dénonciation</td><td>presse clandestine (Faux Soir 09/11/1943) ; réseaux Zéro/Clarence, lignes Comète ; Armée secrète, FI, Groupe G ; CDJ ; grève des 100 000 (05/1941)</td></tr></table>
+<ul><li>Occupation : administration militaire (von Falkenhausen), secrétaires généraux (« moindre mal »), Eupen-Malmedy annexés, travail obligatoire 10/1942. Après : 50 000 condamnations, 242 exécutions.</li>
+<li><b>Question royale :</b> régence Charles 1944-50 ; consultation 12/03/1950 : 57,7% oui (72% Flandre, 42% Wallonie, 48% Bruxelles) ; retour 07/1950, émeutes (4 morts Grâce-Berleur) ; abdication → Baudouin 07/1951. Révèle la fracture F-W.</li>
+<li><span class="w">Pièges :</span> Hitler arrive légalement puis détruit la démocratie · camp de concentration ≠ centre de mise à mort · capitulation armée (28/05/40) ≠ gouvernement (parti à Londres).</li></ul>
+</div></details>
+
+<details><summary>🧊 HISTOIRE · THÈME 4 · EUROPE DEPUIS 1945</summary><div class="in">
+<h4>4.1 Guerre froide (1947-1991)</h4>
+<ul><li>Définition : affrontement idéologique/politique/éco/culturel USA-URSS sans guerre directe (dissuasion, « équilibre de la terreur »), crises périphériques (Corée, Vietnam, Afghanistan). « Paix impossible, guerre improbable » (Aron).</li></ul>
+<table><tr><th></th><th>Bloc occidental</th><th>Bloc de l'Est</th></tr>
+<tr><td>Idéologie</td><td>démocratie libérale</td><td>communisme, parti unique</td></tr>
+<tr><td>Économie</td><td>capitalisme, marché</td><td>collectivisme, planification</td></tr>
+<tr><td>Doctrine</td><td>Truman 1947 (endiguer)</td><td>Jdanov 1947, Kominform</td></tr>
+<tr><td>Aide</td><td>plan Marshall 1947, OECE</td><td>CAEM/Comecon 1949</td></tr>
+<tr><td>Alliance</td><td>OTAN 1949</td><td>Pacte de Varsovie 1955</td></tr></table>
+<ul><li>Phases : 1) 1947-53 tensions (rideau de fer 1946, Prague 1948, blocus Berlin 1948-49, RFA/RDA 1949, bombe URSS 1949, Chine 1949, Corée 1950-53) · 2) 1953-62 coexistence + crises (déstalinisation 1956, Budapest 1956, Spoutnik 1957, mur 13/08/1961, Cuba 10/1962) · 3) 1962-75 détente (téléphone rouge 1963, SALT 1972, Helsinki 1975 ; Vietnam, Prague 1968) · 4) 1975-85 tensions (Afghanistan 1979, euromissiles, Solidarność 1980) · 5) 1985-91 fin (Gorbatchev : perestroïka/glasnost ; 1989 révolutions, mur 09/11/1989 ; réunification 03/10/1990 ; URSS 25/12/1991).</li>
+<li>Effondrement : économie à bout, coût armements/Afghanistan, réformes qui libèrent la parole, aspirations des peuples, nationalismes.</li>
+<li><b>Belgique :</b> fondateur OTAN 1949 ; Spaak sg 1957-61 ; OTAN Bruxelles + SHAPE Casteau 1967 ; missiles Florennes 1985 + manifestations pacifistes.</li></ul>
+<h4>4.2 Construction européenne</h4>
+<ul><li>Motivations : paix (réconciliation FR-ALL), reconstruction, bloc face URSS, peser, charbon/acier. Méthode : solidarités de fait (« petits pas »). Pères : Monnet, Schuman, Adenauer, De Gasperi, Spaak.</li></ul>
+<table><tr><th>Date</th><th>Étape</th></tr>
+<tr><td>1944-48</td><td>Benelux (union douanière)</td></tr>
+<tr><td>09/05/1950</td><td>déclaration Schuman</td></tr>
+<tr><td>1951</td><td>Paris : CECA à six</td></tr>
+<tr><td>25/03/1957</td><td>Rome : CEE + Euratom</td></tr>
+<tr><td>1962/68</td><td>PAC / union douanière</td></tr>
+<tr><td>1973→95</td><td>élargissements (RU/IRL/DK, Grèce, ESP/PT, AUT/FIN/SUE)</td></tr>
+<tr><td>1979</td><td>1ʳ élection Parlement au suffrage direct</td></tr>
+<tr><td>1985/86</td><td>Schengen / Acte unique</td></tr>
+<tr><td>1992</td><td>Maastricht : UE, citoyenneté, monnaie</td></tr>
+<tr><td>1999/2002</td><td>euro scriptural / pièces</td></tr>
+<tr><td>2004/07/13</td><td>25 → 27 → 28 (Croatie)</td></tr>
+<tr><td>2009</td><td>Lisbonne (Van Rompuy 1er président)</td></tr>
+<tr><td>2016/20</td><td>Brexit → 27</td></tr></table>
+<ul><li>Institutions : Commission (Bruxelles, propose/exécute) · Conseil UE + Parlement (votent) · Conseil européen · Cour de justice (Luxembourg) · BCE (Francfort). Débats : élargissement vs approfondissement, unanimité, euroscepticisme, défense, Pacte vert 2019.</li></ul>
+<h4>4.3 Belgique fédérale</h4>
+<ul><li>Causes : linguistique (élite francophone, mouvement flamand : loi égalité 1898, Gand 1930, lois 1932 ; mouvement wallon) · socio-éco (déclin wallon, essor flamand, grève 1960-61, Renard) · politique (question royale, guerres scolaires closes par pacte 1958).</li>
+<li>Réformes : 1962 frontière linguistique · 1968 Louvain · 1970 communautés · 1980 Régions · 1989 Bruxelles-Capitale · <b>1993 « État fédéral » (art. 1)</b> · 2001 · 2012 (BHV, transferts).</li>
+<li>Fédéral : justice, défense, AE, sécu, finances, police. Communautés (personnes) : enseignement, culture, jeunesse, médias, partie santé. Régions (territoire) : éco, emploi, aménagement, environnement, logement, agriculture, énergie en partie. 4 régions linguistiques.</li>
+<li><span class="w">Pièges :</span> Région ≠ Communauté · Flandre : fusionnées · fédérale depuis 1993, pas 1970.</li></ul>
+</div></details>
+
+<details><summary>🌏 HISTOIRE · THÈMES 5-6-7 · SUD, ÉCONOMIE, ENJEUX</summary><div class="in">
+<h4>5 · Hémisphère sud</h4>
+<ul><li><b>Décolonisation :</b> 1945-70s, Asie puis Afrique. Causes : métropoles affaiblies, participation des colonisés, Charte Atlantique/ONU, hostilité USA-URSS, élites nationalistes, Bandung 1955, non-alignement 1961. Voies : négociée (Inde/Pakistan 15/08/1947, Ghana 1957), guerre (Indochine 1946-54 Diên Biên Phu, Algérie 1954-62 Évian 05/07/1962), précipitée (Congo 1960).</li>
+<li><b>Congo :</b> 1955 plan Van Bilsen · 1956 ABAKO · 1958 MNC Lumumba · 04/01/1959 émeutes Léopoldville · Table ronde 1960 · <b>30/06/1960 indépendance</b> (Kasa-Vubu prés., Lumumba PM) · 07/1960 mutinerie, Katanga (Tshombe), ONU · 09/1960 Lumumba révoqué · <b>17/01/1961 assassinat</b> (responsabilité morale BE 2002) · 1965 Mobutu → Zaïre 1971 → RDC 1997. Chaos : peu de cadres, indépendance en 18 mois, armée belge, intérêts Katanga, guerre froide.</li>
+<li><b>Mal-développement :</b> sous-développement (besoins essentiels non satisfaits) · mal-développement (croissance sans amélioration pour tous) · tiers-monde (Sauvy 1952) · Nord/Sud (Brandt 1980) · PMA · émergents (BRICS) · IDH (PNUD 1990 : santé, éducation, revenu). Thèses : libérale (retard, Rostow), tiers-mondiste (dépendance, héritage colonial, termes de l'échange), facteurs internes. Dette 1982 → plans FMI → PPTE 1996 ; OMD 2000 → ODD 2015 ; aide 0,7% ; microcrédit (Yunus 2006).</li>
+<li><b>Chine :</b> Mao 1949 · Grand Bond 1958-62 (famine) · Rév. culturelle 1966-76 · Deng 1978 (économie socialiste de marché, ZES Shenzhen 1980) · Tian'anmen 1989 · Hong Kong 1997 · OMC 2001 · 2ᵉ éco 2010 · routes de la soie 2013.</li>
+<li><span class="w">Pièges :</span> croissance ≠ développement · Sud non homogène · indépendance politique ≠ économique.</li></ul>
+<h4>6 · Économie et société</h4>
+<ul><li>Reconstruction : Marshall ; « miracle belge » ; bataille du charbon (accord Italie 1946) ; Bois du Cazier 08/08/1956 (262 morts dont 136 Italiens) ; Pacte social 1944 → sécu (arrêté-loi 28/12/1944).</li>
+<li><b>Trente Glorieuses 1945-73 :</b> ±5%/an, plein emploi, consommation, baby-boom, État-providence, keynésianisme, immigration (Italie 1946, Espagne 1956, Grèce 1957, Maroc/Turquie 1964…). BE : lois expansion 1959 (investissements en Flandre), déclin charbonnier wallon.</li>
+<li>Crises : 1973 (Kippour, baril ×4), 1979 (Iran), Bretton Woods fin 1971-73, stagflation, désindustrialisation, chômage de masse, dette BE ±130% PIB 1993 ; néolibéralisme (Thatcher 1979, Reagan 1981) ; BE Martens-Gol 1981-87. Depuis 1990 : Internet, euro, subprimes 2007-08 (Lehman, Fortis/Dexia), Grèce 2010, Covid 2020, inflation 2022.</li>
+<li>Explications : cycles (Kondratiev ±50 ans), innovations (Schumpeter), keynésianisme, monétarisme (Friedman), chocs externes.</li>
+<li><b>Mondialisation :</b> intégration croissante par flux. Étapes : découvertes, 1ʳᵉ 1850-1914, repli 1914-45, GATT 1947, accélération 1980s (conteneur, Web 1991, OMC 1995, Chine 2001). Acteurs : États, FMN, OI, organisations régionales, ONG, migrants. Espaces : Triade, façades (Rotterdam, Anvers), métropoles. Effets + : croissance, prix, recul pauvreté (Asie). Effets − : délocalisations, dumping, inégalités, uniformisation, crises contagieuses. Contestation : Seattle 1999, FSM 2001, protectionnisme.</li></ul>
+<h4>7 · Problèmes et enjeux</h4>
+<ul><li>Mentalités : Mai 68 (ULB, Louvain) ; femmes : vote 1948, FN Herstal 1966, contraception 1973, avortement 03/04/1990 (Baudouin), parité 2002 ; sécularisation ; BE pionnière (euthanasie 2002, mariage 2003, adoption 2006) ; MLK 1963, loi Moureaux 1981 ; écologie (Club Rome 1972, Tchernobyl 1986, Brundtland 1987, Rio 1992, Kyoto 1997, Paris 2015, marches 2019) ; mémoire Shoah + colonial (commission 2020-22).</li>
+<li><b>Médias :</b> information (vérifiée, sourcée, datée) vs désinformation (volontaire) / mésinformation ; propagande ; censure (interdite Constitution 1831). Évolution : presse d'opinion, radio 1930, TV 1953/1987, Internet (FB 2004, YT 2005, TW 2006, smartphone 2007), algorithmes, bulles, fake news, deepfakes, IA 2022. Enjeux : pluralisme, indépendance, vérification, Cambridge Analytica 2018, RGPD 2018, DSA. Critiquer un média = grille de fiabilité.</li>
+<li><b>Géopolitique :</b> ONU 26/06/1945 SF, NY, 193 États ; Assemblée (1 État=1 voix), Conseil sécurité (15, 5 permanents veto : USA, Russie, Chine, FR, RU), Secrétariat, CIJ La Haye ; agences (UNESCO, OMS, FAO, UNICEF, HCR, PNUD, OIT) ; Bretton Woods (FMI, BM) ; limites : veto, pas d'armée. Autres : OTAN (32 depuis Finlande 2023/Suède 2024), UE, OMC 1995, UA 2002, ASEAN 1967, G7/G20, CPI 2002. Depuis 1991 : Golfe 1991, Yougoslavie (Srebrenica 1995), Rwanda 1994 (10 Casques bleus BE), 11/09/2001, Afghanistan/Irak, printemps arabes 2011, Syrie, EI, Paris 2015/Bruxelles 22/03/2016, multipolarité (Chine, Russie : Crimée 2014, Ukraine 24/02/2022), Gaza 07/10/2023, climat/migrations.</li></ul>
+</div></details>
+
+<details><summary>🧰 LES 18 OUTILS CONCEPTUELS</summary><div class="in">
+<ul>
+<li><b>1 Colonisation :</b> prise de contrôle d'un territoire étranger (domine, administre, exploite). Caract. : étapes (exploration→conquête→organisation→exploitation), acteurs, justification, colons ou non. Ex : EIC 1885, Congo belge 1908, Algérie.</li>
+<li><b>2 Décolonisation / néocolonialisme :</b> accès à l'indépendance ; néocolonialisme = domination prolongée autrement (éco, armée, culture). Caract. : voie négociée/armée, élites, ONU, guerre froide, dépendance. Ex : Inde 1947, Algérie 1962, Congo 1960 + Katanga.</li>
+<li><b>3 Politique impérialiste :</b> volonté d'étendre sa domination, avec ou sans annexion. Caract. : moyens (armée, capitaux, culture), formes (colonie, protectorat, zone d'influence). Ex : partage Afrique, espace vital nazi, blocs.</li>
+<li><b>4 Phénomène migratoire :</b> déplacement durable de population. Caract. : origine/destination, facteurs répulsifs/attractifs, volume, type, conséquences. Ex : émigration XIXᵉ, exode rural, Italiens 1946.</li>
+<li><b>5 Capitaliste / collectiviste :</b> cap : propriété privée, marché, profit, salariat ; coll : propriété d'État, planification, prix fixés. Caract. : qui possède ? qui décide ? prix ? Ex : USA 1920 / URSS ; New Deal = régulé.</li>
+<li><b>6 Croissance / développement :</b> croissance = hausse durable PIB (quantitatif) ; développement = bien-être de toute la population (IDH, qualitatif). Ex : Trente Glorieuses ; Chine inégalitaire.</li>
+<li><b>7 Sous-développement :</b> incapacité durable à satisfaire besoins essentiels. Caract. : IDH, espérance, mortalité infantile, alphabétisation, dépendance exportations. Ex : PMA Afrique subsaharienne.</li>
+<li><b>8 Libéral / socialiste / communiste :</b> 4 critères : individu, État, propriété, moyens. Libéral : libertés+marché ; socialiste : égalité par réformes ; communiste : abolition propriété par révolution. Ex : Parti libéral, POB, bolcheviks.</li>
+<li><b>9 Stratifications / inégalités :</b> hiérarchie en groupes (ordres, classes, castes, races). Caract. : critères du rang, inégalités (vote, logement, école), mobilité. Ex : bourgeoisie/prolétariat, société coloniale, apartheid.</li>
+<li><b>10 Situation de crise :</b> rupture brutale d'un équilibre. Caract. : déclencheur, causes, manifestations, extension, durée, conséquences, solutions. Ex : 1929, Cuba 1962, chocs, 2008.</li>
+<li><b>11 Conservateur / réformiste :</b> conserver l'ordre vs changer par la loi. ≠ révolutionnaire (radical, violent), réactionnaire (retour). Ex : catholiques XIXᵉ, POB, bolcheviks.</li>
+<li><b>12 Système juridique, droits/devoirs :</b> rapports lois ↔ droits. Caract. : citoyen ? égalité ? garanties (juges) ? Ex : Constitution 1831, Nuremberg (droit exclut), Déclaration 1948.</li>
+<li><b>13 Caractère démocratique :</b> critères : souveraineté peuple, élections libres, suffrage universel, séparation pouvoirs, État de droit, libertés, minorités, alternance. Ex : BE ; ALL post-1933 ; « démocraties populaires » façade.</li>
+<li><b>14 Autoritaire / totalitaire :</b> autoritaire : pouvoir concentré, libertés restreintes ; totalitaire : contrôle TOTAL (parti unique, idéologie, terreur, propagande, jeunesse, éco dirigée, culte). Ex : Franco/Salazar vs Hitler/Staline.</li>
+<li><b>15 Nationaliste / fédéraliste / universaliste :</b> nation d'abord / entités autonomes unies / valeurs pour tous. Ex : pangermanisme, mouvement flamand ; BE 1993 ; ONU.</li>
+<li><b>16 Philosophie humaniste :</b> l'humain, dignité, raison au centre ; tolérance, libre examen, éducation. Ex : Déclaration 1948, ULB, opposition totalitarismes.</li>
+<li><b>17 Religion et société civile :</b> rapports cultes/État/société. Caract. : séparation, financement, influence lois, sécularisation, piliers. Ex : guerres scolaires + pacte 1958, Rerum Novarum, loi 1990.</li>
+<li><b>18 Expression artistique et société :</b> l'œuvre exprime, sert ou critique sa société. Caract. : contexte, commanditaire, public, message, fonction. Ex : Meunier, Guernica 1937, art nazi/dégénéré, réalisme socialiste, Horta, Tintin au Congo.</li>
+</ul>
+</div></details>
+
+<details><summary>🗺 GÉO · MÉTHODE, CARTO, CONCEPTS, MODÈLES</summary><div class="in">
+<h4>Ce que l'épreuve évalue (programme 485/2018/240)</h4>
+<ul><li>UAA 1 : inégale répartition populations/ressources (énergie, matières premières, flux, dépendances). UAA 2 : gestion des risques naturels/technologiques. UAA 3 : aménagement du territoire, accès aux fonctions.</li>
+<li>Processus : <b>Connaître</b> (repères, notions, modèles) · <b>Appliquer</b> (décrire, comparer, communiquer sur documents同 type) · <b>Transférer</b> (éclairer un enjeu dans une situation nouvelle).</li>
+<li><b>Démarche :</b> décrire une répartition (où ? continuités/discontinuités) → interroger (« pourquoi là ? ») → comparer (facteurs de localisation) → hypothèses → communiquer (carte, tableau, texte). Décrire = qualifier + situer, sans connaissances ; analyser en exige.</li>
+<li><b>4 productions :</b> annoter une représentation · carte schématique/croquis · commenter en quelques phrases · tableau atouts/contraintes.</li>
+<li><b>Verbes :</b> LOCALISER (où) · SITUER (par rapport à) · NOMMER · DÉCRIRE (j'observe) · ANALYSER/EXPLIQUER (avec connaissances) · PRÉSENTER (carte d'identité) · DÉFINIR · PRÉLEVER · CLASSER · CITER (recopier extrait entre guillemets) · CONFRONTER (tous les documents).</li></ul>
+<h4>Cartographie</h4>
+<table><tr><th>Figurés ponctuels</th><th>Linéaires</th><th>De surface</th></tr>
+<tr><td>ville/usine/port (formes) ; cercles proportionnels (valeurs absolues) ; taille = hiérarchie</td><td>route, voie ferrée, frontière ; autoroute épaisse / route fine ; flux = épaisseur flèche</td><td>plages ordonnées clair→foncé (valeurs relatives %) ; couleurs différentes (qualitatif) ; hachures</td></tr></table>
+<ul><li><b>Éléments obligatoires :</b> titre complet (info + territoire + année) · orientation (nord) · légende organisée en rubriques (figurés identiques à la carte) · échelle · sources.</li>
+<li><b>3 opérations :</b> représenter (figuré adapté) · hiérarchiser (taille/épaisseur/intensité) · différencier (couleur/forme).</li>
+<li><b>Apprécier une carte :</b> type (thématique, schématique, croquis, plan) · indicateurs absolus (cercles) vs relatifs (plages) — <span class="r">valeurs absolues en plages = erreur</span> · unités de surface (découpage change l'image).</li>
+<li><span class="r">Erreurs qui coûtent :</span> titre incomplet · couleurs non ordonnées · légende en vrac · figuré légende ≠ carte · oubli orientation/sources.</li></ul>
+<h4>Concepts du programme</h4>
+<ul><li><b>Continuité/discontinuité :</b> prolongement homogène / rupture nette (sillon Sambre-Meuse = continuité ; frontière linguistique = discontinuité).</li>
+<li><b>Atouts/contraintes :</b> favorisent/freinent (port eau profonde / relief).</li>
+<li><b>Potentialité/vulnérabilité :</b> capacité à se développer / fragilité face à un aléa (plaine inondable urbanisée = vulnérable ; zone venteuse = potentiel éolien).</li>
+<li><b>Aménagement du territoire :</b> action volontaire des pouvoirs publics pour organiser l'espace, accès aux fonctions, réduire déséquilibres, durable.</li>
+<li><b>Migration · Mondialisation · Développement (IDH) · Développement durable</b> (Brundtland 1987 : besoins présents sans compromettre futurs).</li></ul>
+<h4>Liens théoriques</h4>
+<ul><li>Température : latitude (rayons obliques) · altitude (−0,6 °C/100 m) · exposition (adret/ubac). Précipitations : équateur (air monte), 30° (anticyclones secs), 60° (fronts) ; versant au vent vs sous le vent. Continentalité : amplitude forte, moins de pluies. Végétation/sols ← climat.</li>
+<li><b>Circulation :</b> ZCIT (air monte → pluies → forêt humide) · anticyclones subtropicaux (air descend → déserts : Sahara, Arabie, Australie, Kalahari, Atacama) · fronts 60° (Europe O) · air polaire (toundra). Alizés, vents d'ouest, vents polaires.</li>
+<li><b>Biomes :</b> forêt tropicale humide (équatorial, ±27 °C, pluies tt l'an : Amazonie, Congo, Bornéo) · savane (saison pluies+sèche) · désert (amplitude diurne forte) · forêt tempérée (océanique, Belgique) · steppe (continental sec) · taïga (subarctique) · toundra (pergélisol). Europe : garrigue/maquis, feuillus, taïga/toundra.</li>
+<li><b>Tectonique :</b> divergence (dorsales, rifts, effusif) · subduction (explosif, fosses, tsunamis) · collision (Himalaya) · transformante (San Andreas). Séismes/volcans aux frontières. Foyer ≠ épicentre ; magnitude (énergie, log) ≠ intensité (I-XII).</li>
+<li><b>Courants :</b> Gulf Stream adoucit Europe O ; Labrador refroidit ; courants froids le long déserts côtiers. El Niño : pluies Pérou, sécheresses Indonésie/Australie. <b>Moussons :</b> été = basses pressions continent → pluies (riziculture dense). Bilan radiatif + albédo (neige 80-90%). Rotation 24 h / révolution 365 j (axe 23°26' → saisons).</li>
+<li><b>Modèles spatiaux :</b> centre/périphérie · auréolaire (couronnes : centre, banlieue, périurbain ; densité/prix décroissent) · réticulaire (nœuds + axes + flux : autoroutes BE) · mono/polycentrisme (Paris vs Randstad/BE) · mono/polyfonctionnel (zoning vs centre-ville). Méthode transfert : nommer le modèle, montrer correspondances, puis écarts.</li></ul>
+<h4>Repères à redessiner (pas d'atlas le jour J)</h4>
+<ul><li><b>Monde repères :</b> équateur, tropiques Cancer/Capricorne, cercles polaires, Greenwich · reliefs : Himalaya, Rocheuses, Andes, Rift · fleuves : Amazone, Mississippi, Gange, Huang He, Yangzi Jiang, Congo, Nil, Mékong, Indus, Brahmapoutre · 7 continents, 5 océans.</li>
+<li><b>Monde population :</b> peuplés : Asie Est, Asie Sud, Indonésie, Golfe de Guinée, Grands Lacs, Est Am. Nord, Europe · peu peuplés : Amazonie, cuvette Congo, Bornéo, Sahara, centre Australie, Arabie, Gobi, nord 60°N, Antarctique, Himalaya, Rocheuses, Andes · 15 aires urbaines : Tokyo, Delhi, Shanghai, São Paulo, Mumbai, Mexico, Beijing, Osaka, Le Caire, New York, Dhaka, Karachi, Buenos Aires, Kolkata, Istanbul.</li>
+<li><b>Europe :</b> 15 aires + Bruxelles (16) : Moscou, Paris, Londres, Madrid, Barcelone, St-Pétersbourg, Rome, Berlin, Milan, Athènes, Kiev, Lisbonne, Manchester, Birmingham, Naples · mers : Nord+Manche, Méditerranée, Noire, Baltique · reliefs : Alpes, Pyrénées, Oural, plaines O/N · fleuves : Rhin, Rhône, Danube · UE 27.</li>
+<li><b>Belgique :</b> 3 Régions + frontière linguistique (1962-63) + germanophones · 7 aires : Anvers, Bruges, Bruxelles, Charleroi, Gand, Liège, Namur + voisines (Lille, Aix, Maastricht, Lux.) · autoroutes E40, E19, E17, E411, E42, E313, E25 · sillon Sambre-Meuse · Meuse, Escaut, Yser, Sambre · 3 phrases : centre dense (Bruxelles + losange flamand) ; sillon en reconversion ; Ardenne peu peuplée/forestière ; réseau centré sur Bruxelles.</li></ul>
+</div></details>
+
+<details><summary>⚡ GÉO · UAA 1-2-3</summary><div class="in">
+<h4>UAA 1 · Énergie et matières premières</h4>
+<ul><li>Notions : sous-sol, mine · renouvelable (flux : soleil, vent, eau, biomasse, géothermie) / non renouvelable (stock : charbon, pétrole, gaz, uranium) · primaire (nature) / secondaire (transformée : électricité, carburants) / finale (consommée).</li>
+<li>Consommation primaire mondiale 2023 : pétrole 32%, charbon 26%, gaz 23%, hydraulique 6%, nucléaire 4%, éolien/solaire/autre 9% → <b>fossiles ≈ 80%</b>.</li>
+<li>Ressources : pétrole (réserves Venezuela/Arabie/Iran ; prod USA/Arabie/Russie ; OPEP 1960) · gaz (Russie/Iran/Qatar) · charbon (Chine ± moitié, le + émetteur) · uranium (Kazakhstan) · cobalt (RDC ±70%, enjeu éthique) · lithium (Australie/Chili/Chine + triangle) · terres rares (Chine raffinage) · cuivre (Chili, RDC).</li>
+<li>Facteurs localisation : géologie, accessibilité/coût transport, technologie (schiste), capitaux, stabilité, climat. Flux par oléoducs/gazoducs/méthaniers ; passages vulnérables : <b>Ormuz (±1/5 pétrole), Malacca, Suez, Bab el-Mandeb, Bosphore</b>. Enjeux : dépendance (UE ±40% gaz russe avant 2022), malédiction des ressources, métaux critiques, recyclage, climat.</li>
+<li><b>Belgique :</b> pauvre depuis fin charbon (1992), dépendante ; nucléaire Doel/Tihange 40-50%, loi sortie 2003, prolongation Doel 4 + Tihange 3 → 2035, abrogation 2025 ; gaz, éolien mer, solaire ; friches wallonnes. <b>Allemagne :</b> sortie nucléaire 2023 ; éolien nord / solaire sud ; lignite (sortie 2038) ; transport nord→sud.</li></ul>
+<h4>UAA 2 · Risques</h4>
+<ul><li><b>Aléa × Vulnérabilité = Risque</b> (catastrophe si dégâts majeurs). Vulnérabilité : densité, qualité constructions, préparation, information, développement. Résilience = se relever ; résistance = aménagements préventifs.</li>
+<li>Aléas : séisme (frontières plaques, tsunami) · volcan (effusif/explosif, ceinture feu, rifts, points chauds) · cyclone tropical (océan &gt;26 °C, 5-20° lat., &gt;118 km/h ; ouragan/typhon/cyclone ; Saffir-Simpson 1-5) · désertification (Sahel, Grande Muraille verte) · inondation (lit mineur→majeur, imperméabilisation) · autres (glissements, coulées, érosion, sécheresses, tornades).</li>
+<li>Technologiques : industriel/chimique (Seveso 1976, Bhopal 1984, Ghislenghien 2004, 24 morts) · nucléaire (Tchernobyl 1986, Fukushima 2011) · transport matières dangereuses (Wetteren 2013) · rupture barrage.</li>
+<li><b>Haïti 12/01/2010 (7,0) : 200 000 morts vs Chili 27/02/2010 (8,8, 500× énergie) : ±500 morts</b> → la différence = vulnérabilité.</li>
+<li>Gestion : prévision (surveillance, alerte) · prévention (cartes, plans, normes, info, exercices) · protection (digues, bassins, zones d'immersion, reboisement) · crise (plans, évacuation, secours) · après (reconstruction, assurances, retour d'expérience).</li>
+<li><b>Belgique 07/2021 :</b> Vesdre, Ourthe, Amblève (Pepinster, Verviers, Chaudfontaine), ±40 morts. Aléa : pluies exceptionnelles, sols saturés, vallées encaissées. Vulnérabilité : urbanisation ancienne fonds de vallée, imperméabilisation. Réponses : reconstruction, révision cartographie, enquête parlementaire.</li>
+<li>Climat : fonte, élévation mers, désertification, régime pluies → aléas + fréquents/intenses. <span class="w">Piège :</span> pas de « géographie des catastrophes » ; aléa ≠ risque.</li></ul>
+<h4>UAA 3 · Aménagement du territoire</h4>
+<ul><li>Fonctions : logement, emploi, santé, enseignement, commerce, tourisme, patrimoine, transport, information. Accès : distance-temps, distance-coût, zone d'influence, bassin d'emploi, migrations pendulaires (fortes vers Bruxelles), fracture numérique, déserts médicaux (Ardenne).</li>
+<li><b>Étalement urbain :</b> causes (prix sol, cadre 4 façades, voiture, politiques) → conséquences (artificialisation, dépendance auto, embouteillages, coût réseaux, imperméabilisation, déclin centres).</li>
+<li>Acteurs : publics (UE fonds, État rail, Régions aménagement depuis 1980, provinces, communes permis) · privés (promoteurs, entreprises) · citoyens (enquête publique, recours, comités).</li>
+<li>Outils Wallonie : CoDT 2017 · <b>plan de secteur = plan d'affectation du sol (juridique, contraignant)</b> · SDT = schéma stratégique (zéro artificialisation nette 2050) · permis · rénovation · friches. Flandre « stop béton » ; Bruxelles PRAS. <span class="w">Ne pas confondre :</span> affectation ≠ utilisation ; plan (contraignant) ≠ schéma (orientations).</li>
+<li><b>Conflit d'usage :</b> acteurs veulent même espace pour fonctions incompatibles (Liège Airport vs riverains ; éoliennes vs paysage ; carrière vs habitat ; logements vs terres ; réserve vs loisirs). Analyser : fonctions, acteurs, intentions, arguments, arbitrage.</li>
+<li>Prospective : scénarios tendanciel/volontariste (vieillissement, transition, télétravail, montée eaux, zéro artificialisation).</li>
+<li>Belgique : 11,8 M hab., ±390 hab/km² ; Bruxelles capitale nationale+européenne ; losange flamand ; Anvers-Bruges 2ᵉ port Europe ; axe E411 ; Brabant wallon ; sillon reconversion ; Ardenne.</li>
+<li><b>Tâches transfert :</b> caractériser flux · aménagements face aléa · espaces à risque via modèle · accès fonction · atouts/contraintes/potentialités/vulnérabilités · effets aménagement · fonctions/intentions acteurs · comparer à modèle spatial.</li></ul>
+</div></details>
+
+<details><summary>🧪 SCIENCES · MÉTHODE + FORMULAIRES + TABLES</summary><div class="in">
+<h4>L'épreuve du 24 septembre</h4>
+<ul><li>Écrit 3 h, un questionnaire ; conçu 1 h physique / 1 h chimie / 1 h bio : tu gères. Chaque branche /60 → /180 → /20. <b>Dispense si moyenne 50% (90/180)</b>, à condition de présenter les trois.</li>
+<li>Documents remis (rien écrire dessus) : tableau périodique recto-verso (verso : E°, Kps, pKa) · table constantes physiques · feuille consignes. <span class="r">Tableau périodique personnel interdit.</span> Table de solubilité NON remise → connais les précipités.</li>
+<li>Matériel : crayons HB + 3 couleurs, latte, équerre, rapporteur, calculatrice non programmable (TI-30XB, fx-92B, fx-220), trousse transparente. Pas de brouillon, pas de tipp-ex. Réponses dans les cadres (sinon nullité). QCM : noircir la puce.</li>
+<li>Répartition 2024-25 : phy UAA5:25, 6:12, 7:15, 8:13 · chi UAA5:15, 6:10, 7:10, 8:30 · bio UAA4:31, 5:20, 6:14. Blocs lourds : chimie UAA8, bio UAA4.</li></ul>
+<h4>⚠ Les 5 éléments (sinon 0)</h4>
+<ul><li>Toute réponse numérique non justifiée = 0. Elements : <b>1</b> grandeur recherchée · <b>2</b> formule · <b>3</b> calcul · <b>4</b> résultat · <b>5</b> unité.</li></ul>
+<pre>Modèle (q6 2024-25 : f d'un rayonnement γ, λ = 0,001 nm)
+Grandeur : la fréquence f.
+Conversion : λ = 0,001 nm = 1·10⁻³ × 10⁻⁹ m = 1·10⁻¹² m.
+Formule : c = λ·f ⇒ f = c/λ.
+Calcul : f = 3·10⁸ / 1·10⁻¹².
+Réponse : f = 3·10²⁰ Hz.</pre>
+<ul><li><b>Citer :</b> réponse brève (un mot), sans explication. (En géo, CITER = recopier extrait : pas ici.) <b>Justifier :</b> phrase de raisonnement/définition · formule+calcul · analyse graphique · exploitation expérience. « Affirmer n'est pas justifier. »</li>
+<li><b>Orthographe bio/chimie :</b> terme mal écrit = 0 point (aluminium, soufre, trophoblaste, gonadotrophine chorionique, œstrogènes, progestérone, lymphocyte, anticorps, désoxyribonucléique, thiocyanate…).</li>
+<li>Lire tout l'exercice avant la 1ʳ sous-question. Unités SI : km/h→m/s (÷3,6) · nm→m (×10⁻⁹) · min→s (×60) · diamètre→rayon (÷2) · g→kg.</li>
+<li><b>Verbes officiels :</b> Analyser (décomposer) · Comparer · Déduire · Définir · Décrire · Déterminer · Énoncer · Expliquer · Identifier · Interpréter · Justifier · Schématiser.</li>
+<li><b>Plan de temps :</b> branche la + solide d'abord · 55 min/branche · 15 min relecture unités + 5 éléments.</li></ul>
+<h4>Formulaire physique</h4>
+<pre>v = Δx/Δt (m/s ; 1 m/s = 3,6 km/h)      a = Δv/Δt (m/s²)
+MRUA : d = v̄·t, v̄ = (v₀+v)/2             F = m·a (N)
+P = m·g (g = 9,81)                        F = G·m·M/d² (G = 6,67·10⁻¹¹)
+g = G·M/R² ; altitude h : g = G·M/(R+h)²
+Ec = ½mv²   Ep = mgh (J)                  f = 1/T ; v = λ/T = λ·f ; c = λ·f
+écho/foudre : d = v·Δt (son 340 m/s air)  A = A₀/2ⁿ (Bq)
+η = utile/consommée (&lt;1)                  P = E/t (W)</pre>
+<h4>Formulaire chimie</h4>
+<pre>n = m/M (mol)      c = n/V (mol/L)
+Kc = [C]ᶜ[D]ᵈ / ([A]ᵃ[B]ᵇ)   (ni solides, ni eau solvant ; T seule influence)
+pH = -log[H₃O⁺] ; [H₃O⁺] = 10⁻ᴴ ; à 25 °C : [H₃O⁺][OH⁻] = 10⁻¹⁴
+Alcanes CₙH₂ₙ₊₂ (masse = 14n+2 u) · Alcènes CₙH₂ₙ</pre>
+<h4>Tables</h4>
+<pre>POTENTIELS E° (V) — oxydant fort si E° haut
+F₂/F⁻ +2,87 · MnO₄⁻/Mn²⁺ +1,51 · Cl₂/Cl⁻ +1,36 · Br₂/Br⁻ +1,07
+Ag⁺/Ag +0,80 · Fe³⁺/Fe²⁺ +0,77 · I₂/I⁻ +0,54 · Cu²⁺/Cu +0,34
+H⁺/H₂ 0,00 · Pb²⁺/Pb -0,13 · Ni²⁺/Ni -0,25 · Fe²⁺/Fe -0,44
+Zn²⁺/Zn -0,76 · Al³⁺/Al -1,66 · Mg²⁺/Mg -2,37 · Na⁺/Na -2,71
+
+pKa (25 °C) — acide fort si pKa petit
+H₃O⁺/H₂O 0 · HF/F⁻ 3,2 · CH₃COOH/CH₃COO⁻ 4,8 · H₂CO₃/HCO₃⁻ 6,4
+HSO₃⁻/SO₃²⁻ 7,2 · NH₄⁺/NH₃ 9,2 · HCO₃⁻/CO₃²⁻ 10,3 · H₂O/OH⁻ 14
+
+ÉLECTRONÉGATIVITÉS : H 2,1 · C 2,5 · N 3,0 · O 3,5 · F 4,0 · Na 0,9 · Mg 1,2 · Cl 3,0 · K 0,8
+
+PRÉCIPITÉS : Cu(OH)₂ BLEU · Fe(OH)₂ vert · Fe(OH)₃ rouille · AgCl BLANC
+AgBr/AgI/PbI₂ jaunes · BaSO₄/CaCO₃/CaSO₄/PbSO₄ blancs · sulfures Ag/Cu/Fe noirs
+Toujours solubles : sels de Na⁺, K⁺, NH₄⁺ et tous les nitrates</pre>
+<h4>Code génétique (fourni à l'épreuve)</h4>
+<pre>UUU Phe UUC Phe UUA Leu UUG Leu | UCU Ser UCC Ser UCA Ser UCG Ser
+UAU Tyr UAC Tyr UAA STOP UAG STOP | UGU Cys UGC Cys UGA STOP UGG Trp
+CUU Leu CUC Leu CUA Leu CUG Leu | CCU Pro CCC Pro CCA Pro CCG Pro
+CAU His CAC His CAA Gln CAG Gln | CGU Arg CGC Arg CGA Arg CGG Arg
+AUU Ile AUC Ile AUA Ile AUG Met★ | ACU Thr ACC Thr ACA Thr ACG Thr
+AAU Asn AAC Asn AAA Lys AAG Lys | AGU Ser AGC Ser AGA Arg AGG Arg
+GUU Val GUC Val GUA Val GUG Val | GCU Ala GCC Ala GCA Ala GCG Ala
+GAU Asp GAC Asp GAA Glu GAG Glu | GGU Gly GGC Gly GGA Gly GGG Gly
+★ AUG = début (Met) · STOP = UAA, UAG, UGA</pre>
+<h4>Veille et jour J</h4>
+<ul><li>Trousse : stylo effaçable, HB+gomme, 3 couleurs, latte/équerre/rapporteur, calculatrice testée, CI+convocation. Interdit : brouillon, notes, tableau perso, tipp-ex, trousse opaque, objets connectés.</li>
+<li>Pendant : lire chaque exercice en entier · cadres · 5 éléments par calcul · SI avant calcul · orthographe bio/chimie · rien sur tableau périodique · présenter les 3 branches · 15 min relecture.</li></ul>
+</div></details>
+
+<details><summary>📏 PHYSIQUE · P5 FORCES ET MOUVEMENTS</summary><div class="in">
+<ul><li><b>Référentiel :</b> objet par rapport auquel on décrit. Mouvement/trajectoire relatifs (passager immobile vs train, en mouvement vs quai).</li>
+<li>v moyenne = Δx/Δt ; v instantanée = pente tangente x(t) ; a moyenne = Δv/Δt ; 1 m/s = 3,6 km/h.</li></ul>
+<table><tr><th></th><th>MRU</th><th>MRUA</th></tr>
+<tr><td>Définition</td><td>rectiligne, v constante</td><td>rectiligne, a constante</td></tr>
+<tr><td>x(t)</td><td>droite (pente = v)</td><td>parabole</td></tr>
+<tr><td>v(t)</td><td>horizontale</td><td>droite (pente = a)</td></tr>
+<tr><td>a(t)</td><td>a = 0</td><td>horizontale</td></tr>
+<tr><td>Distance</td><td>d = v·t</td><td>d = v̄·t, v̄ = (v₀+v)/2</td></tr></table>
+<ul><li>Passer d'un graphique à l'autre : pente x(t) = v ; pente v(t) = a ; aire sous v(t) = distance. Palier horizontal x(t) = arrêt (v=0).</li></ul>
+<h5>Exercice résolu 1 (2024-25, 6 pts) : tracer v(t) depuis x(t)</h5>
+<ul><li>0-5 min : v₁ = 300 m/300 s = 1 m/s · 5-7 min : v₂ = 300 m/120 s = 2,5 m/s · 7-12 min : x ne change pas → v₃ = 0. Annoter axes t(min), v(m/s).</li></ul>
+<h5>Exercice résolu 2 (2024-25, 7 pts) : guépard 18→126 km/h en 5 s</h5>
+<ul><li>Conversions : v₀ = 5 m/s ; v = 35 m/s. a = Δv/Δt = 30/5 = <b>6 m/s²</b>. v̄ = 20 m/s ; d = 20×5 = <b>100 m</b>.</li></ul>
+<h4>Lois de Newton</h4>
+<table><tr><th>Loi</th><th>Énoncé</th><th>Exemple</th></tr>
+<tr><td>1ʳ (inertie)</td><td>forces compensées → repos ou MRU</td><td>passager non attaché continue</td></tr>
+<tr><td>2ᵉ</td><td>F = m·a</td><td>freiner + fort = décélération + grande</td></tr>
+<tr><td>3ᵉ</td><td>action-réaction égale/opposée</td><td>recul arme, fusée</td></tr></table>
+<ul><li>Forces : P = m·g (9,81), réaction support, frottements, tension, poussée. Masse (kg) invariable ; poids (N) dépend de g.</li>
+<li><b>Chute :</b> vide → tous corps même a = g. Fluide → frottements croissent jusqu'à compenser poids → <b>vitesse limite</b> (parachutiste).</li>
+<li><b>MCU :</b> constants : norme v, ω, norme a. Varient : direction v (tangente), direction a (vers centre). a ≠ 0 car direction v change ; a et F centripètes ⊥ v ; sans force centripète → ligne droite (inertie).</li>
+<li><b>Sécurité routière :</b> ceinture (inertie → pare-brise/volant) ; airbag/zones déformables/casque allongent durée choc → force réduite ; bus : freinage → projeté avant, démarrage → arrière ; distance arrêt = réaction + freinage (freinage ∝ v²) ; virage : force vers centre, + vite = + de force, glissante → tout droit.</li></ul>
+<h5>Justifier « 90 km/h vs mur = chute de 11 étages »</h5>
+<ul><li>v = 25 m/s ; ½mv² = mgh → h = v²/(2g) = 625/19,62 ≈ <b>32 m</b> ≈ 11 étages de 3 m.</li></ul>
+</div></details>
+
+<details><summary>🌊 PHYSIQUE · P6 ONDES + P7 ÉNERGIE + P8 COSMOS</summary><div class="in">
+<h4>P6 · Oscillations et ondes</h4>
+<ul><li>Oscillation : va-et-vient autour d'équilibre. Onde : propagation perturbation sans transport matière, avec transport énergie.</li></ul>
+<table><tr><th></th><th>Mécanique</th><th>Électromagnétique</th></tr>
+<tr><td>Milieu</td><td>requis</td><td>vide possible</td></tr>
+<tr><td>Exemples</td><td>son, vagues, sismiques</td><td>lumière, radio, X, γ</td></tr>
+<tr><td>Vitesse</td><td>son : 340 air / 1500 eau / 5000 acier</td><td>c = 3·10⁸ vide</td></tr></table>
+<ul><li>Transversale (⊥ : vague, corde, S) · longitudinale (∥ : son, ressort, P). Grandeurs : A (amplitude → énergie), λ, T, f = 1/T (Hz), v = λ/T = λ·f.</li>
+<li>Phénomènes : réflexion (écho, sonar) · réfraction (change milieu) · diffraction (contourne obstacle) · interférences · résonance (fréquence propre : verre, pont) · Doppler (source approche = aigu). Concordance/opposition de phase.</li>
+<li><b>Sons :</b> audibles 20-20 000 Hz ; infrasons/ultrasons (échographie, chauves-souris). Hauteur = fréquence ; intensité = dB (danger &gt;85, douleur ±120 ; aucun calcul au programme) ; timbre = forme d'onde. Oscillogrammes : pur = sinusoïde · complexe = périodique non sinusoïdal · bruit = apériodique.</li></ul>
+<h5>Exercice résolu (2024-25, 3 pts) : marteau à 300 m</h5>
+<ul><li>Lumière quasi instantanée ; son : Δt = 300/340 ≈ <b>0,88 s</b>. Foudre : d ≈ 340 × secondes entre éclair et tonnerre.</li></ul>
+<ul><li><b>Spectre EM :</b> γ (&lt;0,01 nm) · X (0,01-10) · UV (10-400) · visible (400-780) · IR (780 nm-1 mm) · micro-ondes (1 mm-30 cm) · radio (&gt;30 cm). λ diminue → f et énergie augmentent (γ, X, UV ionisants). Induction entre bobines (chargeur, plaque). Applications : échographie, Doppler, sonar, fibre, radio.</li></ul>
+<h4>P7 · De l'atome à l'éolienne</h4>
+<ul><li>Notation ᴬZX ; isotopes (même Z, A différents : C12/C14). Radioactivité : transformation spontanée ; conservations : ΣA et ΣZ.</li></ul>
+<table><tr><th>Rayonnement</th><th>Nature</th><th>Pénétration</th><th>Équation type</th></tr>
+<tr><td>α</td><td>noyau ⁴₂He</td><td>faible (papier)</td><td>ᴬZX → ᴬ⁻⁴Z₋₂Y + ⁴₂He</td></tr>
+<tr><td>β⁻</td><td>électron ⁰₋₁e</td><td>moyen (aluminium)</td><td>ᴬZX → ᴬZ₊₁Y + ⁰₋₁e</td></tr>
+<tr><td>γ</td><td>EM très énergétique</td><td>très grand (plomb/béton)</td><td>accompagne α/β</td></tr></table>
+<ul><li>Activité A (Bq) ; demi-vie T ; A = A₀/2ⁿ. Ex : 800 Bq iode 131 (T≈8 j) → 24 j (n=3) → <b>100 Bq</b>. Datation C14 (5730 ans), médecine, stérilisation. Irradiation (distance) ≠ contamination (absorption).</li></ul>
+<h5>Exercice résolu (2024-25, 9 pts) : astate 212 émetteur α</h5>
+<ul><li>²¹²₈₅At → ²⁰⁸₈₃Bi + ⁴₂He. Vérif : 212 = 208+4 ; 85 = 83+2. Z=83 = bismuth. α : noyau hélium, pénétration faible.</li></ul>
+<ul><li><b>Fission :</b> neutron casse U235 → 2 noyaux + 2-3 neutrons + énergie → chaîne contrôlée (barres). <b>Fusion :</b> noyaux légers (Soleil, ITER). Défaut de masse → E = mc². Chaîne centrale : nucléaire → thermique → mécanique → électrique (+ pertes tours refroidissement).</li>
+<li><b>Courant induit :</b> aimant mobile près bobine → champ variable → courant ; + rapide = + intense. Alternateur : mécanique → électrique. Transformateur : 2 bobines, courant alternatif only, élève/abaisse tension. Haute tension → courant faible → moins pertes Joule.</li>
+<li>Premier principe : énergie se conserve. Moteur thermique : chaleur → travail (pertes). Réfrigérateur/PAC : travail pour chaleur froid→chaud. η = utile/consommée &lt;100%. Ex : 1000 MW élec / 3000 MW chaleur ≈ <b>33%</b>.</li>
+<li>Renouvelable (flux : soleil, vent, eau, biomasse, géothermie ; peu CO₂, intermittence, surfaces, stockage) vs non (stock : charbon, pétrole, gaz, uranium ; demande, CO₂, déchets, dépendance).</li></ul>
+<h5>Ordre de grandeur : éoliennes pour 10% de 80 TWh/an</h5>
+<ul><li>Hypothèse : 3 MW × 8760 h × 0,25 ≈ 6,6 GWh/an. Besoin 8000 GWh → ≈ <b>1200 éoliennes</b>. Toujours énoncer hypothèses.</li></ul>
+<h4>P8 · Terre et cosmos</h4>
+<ul><li>Géocentrisme (Ptolémée) → héliocentrisme (Copernic 1543, Galilée 1610) → Newton 1687. c mesurée (Rømer, Fizeau, Foucault) ≈ 3·10⁸.</li>
+<li>Gravitation : F = G·m·M/d² ; g = G·M/R² ; altitude : g = G·M/(R+h)².</li></ul>
+<h5>Exercices résolus</h5>
+<ul><li><b>Martien 70 kg</b> (M = 6,4·10²³, diamètre 6860 km) : R = 3,43·10⁶ m ; g = 6,67·10⁻¹¹×6,4·10²³/(3,43·10⁶)² ≈ 3,63 ; P = 70×3,63 ≈ <b>254 N</b>. <span class="r">⚠ diamètre au lieu du rayon → 63,5 N (4× moins).</span></li>
+<li><b>g à 400 km :</b> 6,67·10⁻¹¹×6·10²⁴/(6,8·10⁶)² ≈ <b>8,7 m/s²</b>. Astronautes flottent car chute libre, pas g nul.</li></ul>
+<ul><li>Soleil : étoile moyenne, centre des planètes (pas Galaxie/Univers). 8 planètes (telluriques : Mercure-Mars ; gazeuses : Jupiter-Neptune) ; Pluton naine 2006 ; anneaux Saturne = glace. + loin = gravitation faible, vitesse orbitale lente, année longue. Lunes/éclipses. UA ≈ 150 M km ; année-lumière ≈ 9,46·10¹⁵ m.</li>
+<li>Étoiles : nébuleuse → protoétoile → fusion H→He ; masse moyenne : géante rouge → nébuleuse planétaire + naine blanche ; très massive : supergéante → supernova → étoile neutrons/trou noir. Voie lactée : spirale ±100 000 al ; Soleil pas au centre. Big Bang 13,8 Ga, expansion (Hubble 1929), rayonnement fossile 1965 ; éléments lourds dans étoiles/supernovas.</li>
+<li>Terre : R 6400 km, 4,6 Ga ; croûte/manteau/noyau externe liquide/interne solide. Atmosphère 78% N₂, 21% O₂, 1% Ar, 0,04% CO₂. Effet de serre naturel : +15 °C au lieu de −18 °C ; renforcé → réchauffement. Bilan radiatif stable : reçue = renvoyée. Habitabilité : eau liquide (zone habitable), atmosphère, T modérée, champ magnétique.</li></ul>
+</div></details>
+
+<details><summary>⚗️ CHIMIE · C5 LIAISONS + C6 ÉQUILIBRES</summary><div class="in">
+<h4>C5 · Liaisons chimiques</h4>
+<ul><li>Électrons de valence = dernière couche (familles « a » : numéro = nb valence : Na Ia→1, C IVa→4, O VIa→6, Cl VIIa→7). Règle octet (2 pour H). EN : attire électrons ; augmente → droite/haut (F max).</li>
+<li><b>Lewis :</b> tous doublets (liants + non liants), sens polarisation (flèche vers + EN), charges δ+/δ− ou totales (consigne épreuve).</li></ul>
+<table><tr><th>Liaison</th><th>Critère ΔEN</th><th>Mécanisme</th><th>Exemple</th></tr>
+<tr><td>Covalente pure</td><td>nulle/très faible</td><td>partage égal</td><td>Cl₂, O₂, H₂</td></tr>
+<tr><td>Covalente polarisée</td><td>moyenne (0,4-1,7)</td><td>partage inégal, δ− sur + EN</td><td>H₂O, CO₂, HCl</td></tr>
+<tr><td>Ionique</td><td>grande (&gt;1,7, métal+non-métal)</td><td>transfert → ions</td><td>NaCl : Na⁺ + Cl⁻</td></tr></table>
+<h5>Les 5 espèces du référentiel</h5>
+<ul><li><b>H₂O :</b> coudée (V), ±104,5°, POLAIRE · <b>CH₄ :</b> tétraédrique 109,5°, apolaire (symétrique) · <b>NaCl :</b> ions Na⁺/Cl⁻, réseau cristallin, ionique · <b>CO₂ :</b> linéaire 180°, polarisations s'annulent, apolaire · <b>O₂ :</b> linéaire, covalente pure, apolaire.</li>
+<li>Polarité molécule = liaisons polarisées + géométrie. Polaire si centres δ+/δ− ne coïncident pas (H₂O). Apolaire si liaisons pures (O₂) ou annulation par symétrie (CO₂, CH₄).</li></ul>
+<h5>Réponses modèles 2024-25</h5>
+<ul><li><b>NaCl :</b> Na métal (0,9) + Cl non-métal (3,0) ; Δ = 2,1 &gt; 1,7 → ionique : Na cède électron → Na⁺ + Cl⁻.</li>
+<li><b>CO₂ :</b> covalente (2 non-métaux mettent en commun) ; polarisée (Δ(C-O) = 1,0 → δ− sur O, δ+ sur C) ; apolaire (linéaire, flèches opposées s'annulent) ; modèle linéaire, pas coudé.</li>
+<li><b>Eau :</b> solvant polaire, « le semblable dissout le semblable ». NaCl → Na⁺ + Cl⁻ (ions hydratés, solution conductrice). CH₄/O₂ très peu solubles ; CO₂ un peu (réagit). Filet d'eau dévié par règle électrisée ; huile/hexane non.</li>
+<li>Dissociations : CaCl₂ → Ca²⁺ + 2Cl⁻ · Na₂SO₄ → 2Na⁺ + SO₄²⁻ · Al₂(SO₄)₃ → 2Al³⁺ + 3SO₄²⁻.</li></ul>
+<h4>C6 · Équilibres chimiques</h4>
+<ul><li>Complète (→, un réactif disparaît) vs limitée (⇌, équilibre où coexistent). Équilibre dynamique : réactions directe/inverse mêmes vitesses, concentrations constantes (paliers).</li>
+<li>c = n/V ; <b>Kc = [C]ᶜ[D]ᵈ/([A]ᵃ[B]ᵇ)</b> (produits numérateur, coefficients en exposants, ni solides ni eau solvant ; Kc ne dépend que de T). Kc ≫ 1 → produits ; Kc ≪ 1 → réactifs.</li>
+<li><b>Le Châtelier :</b> perturbation → déplacement sens opposé.</li></ul>
+<table><tr><th>Perturbation</th><th>Déplacement</th></tr>
+<tr><td>+ réactif (ou − produit)</td><td>droite (direct)</td></tr>
+<tr><td>+ produit</td><td>gauche</td></tr>
+<tr><td>pression ↑ (gaz)</td><td>côté moins de moles de gaz</td></tr>
+<tr><td>chauffer</td><td>sens endothermique</td></tr>
+<tr><td>refroidir</td><td>sens exothermique</td></tr></table>
+<h5>Méthode q15 (2024-25) : Fe³⁺ + SCN⁻ ⇌ FeSCN²⁺ (rouge sang)</h5>
+<ul><li>Kc = [FeSCN²⁺]/([Fe³⁺][SCN⁻]). Si chauffer éclaircit ([FeSCN²⁺] ↓) → déplacement gauche → sens inverse absorbe chaleur → <b>direct exothermique</b>. Justifier par valeurs lues. Intervalles d'équilibre = courbes horizontales. Direct exothermique : T ↑ → Kc ↓.</li></ul>
+<h5>Calcul Kc : H₂ + I₂ ⇌ 2HI</h5>
+<ul><li>[H₂]=[I₂]=0,10 ; [HI]=0,70 → Kc = 0,49/0,010 = <b>49</b>. Pour trouver concentration : tableau initial/variation/équilibre + équation.</li>
+<li>Applications : caisson hyperbare (P O₂ ↑ → + O₂ fixé/dissous : CO, plongée) · altitude (− O₂ → − oxyhémoglobine → + globules rouges).</li></ul>
+</div></details>
+
+<details><summary>🔥 CHIMIE · C7 ORGANIQUE + C8 RÉACTIONS</summary><div class="in">
+<h4>C7 · Chimie organique</h4>
+<ul><li>Organique = carbone lié à H. CO, CO₂, carbonates, hydrogénocarbonates = inorganiques. Alcanes CₙH₂ₙ₊₂ (simples) ; alcènes CₙH₂ₙ (1 double C=C). Méthane→décane : CH₄, C₂H₆, C₃H₈, C₄H₁₀, C₅H₁₂, C₆H₁₄, C₇H₁₆, C₈H₁₈, C₉H₂₀, C₁₀H₂₂. Éthène C₂H₄, propène C₃H₆.</li></ul>
+<h5>Exercice résolu (2024-25, 4 pts) : alcane 282 u</h5>
+<ul><li>masse = 14n+2 = 282 → n = 20 → <b>C₂₀H₄₂</b>.</li></ul>
+<table><tr><th></th><th>Complète</th><th>Incomplète</th></tr>
+<tr><td>Condition</td><td>O₂ suffisant (virole ouverte)</td><td>O₂ manque (virole fermée)</td></tr>
+<tr><td>Produits</td><td>CO₂ + H₂O</td><td>CO et/ou C (suie) + H₂O</td></tr>
+<tr><td>Observations</td><td>flamme bleue, chaude, pas dépôt</td><td>flamme jaune, fumée, dépôt noir</td></tr>
+<tr><td>Exemple</td><td>CH₄ + 2O₂ → CO₂ + 2H₂O</td><td>2CH₄ + 3O₂ → 2CO + 4H₂O</td></tr></table>
+<ul><li>Pondérer : C d'abord, H ensuite, O en dernier. Propane : C₃H₈ + 5O₂ → 3CO₂ + 4H₂O. Octane : 2C₈H₁₈ + 25O₂ → 16CO₂ + 18H₂O.</li>
+<li><b>CO « tueur silencieux » :</b> incolore, inodore, se fixe sur hémoglobine → détecteur.</li>
+<li>Pouvoir calorifique (MJ/kg) : H₂ 120-140 · gaz naturel ±50 (moins CO₂ des fossiles) · essence/diesel ±45 · charbon ±30 (le +) · bois sec 15-18. TEP ≈ 42 GJ. Carburants : distillation fractionnée (gaz, essence, kérosène, gazole, fioul, bitumes) + craquage.</li>
+<li><b>Polymères :</b> monomères → macromolécule ; n CH₂=CH₂ → (–CH₂–CH₂–)ₙ (polyéthylène). Naturels : cellulose, amidon, protéines, ADN, caoutchouc. Synthétiques : PE, PVC, PET, PS, nylon. Pictogrammes : 1 PET · 2 PEHD · 3 PVC · 4 PEBD · 5 PP · 6 PS · 7 autres. Recyclage : tri, mécanique, chimique, valorisation ; microplastiques.</li></ul>
+<h4>C8 · Grandes classes de réactions (le + gros bloc)</h4>
+<ul><li><b>Précipitation :</b> 2 solutions ioniques → composé insoluble = précipité. Toujours solubles : Na⁺, K⁺, NH₄⁺, nitrates ; autres ions = spectateurs.</li></ul>
+<h5>Exercice résolu (2024-25, 9 pts) : AB₂</h5>
+<ul><li>Précipité bleu avec NaOH → Cu(OH)₂ → A = Cu²⁺. Précipité blanc avec AgNO₃ → AgCl → B = Cl⁻. Composé : <b>CuCl₂</b>. Moléculaire : CuCl₂ + 2NaOH → Cu(OH)₂↓ + 2NaCl. Ionique : Cu²⁺ + 2OH⁻ → Cu(OH)₂↓. Applications : entartrage, épuration phosphates, analyse ions.</li></ul>
+<table><tr><th>Théorie</th><th>Acide</th><th>Base</th></tr>
+<tr><td>Arrhenius</td><td>libère H⁺</td><td>libère OH⁻</td></tr>
+<tr><td>Brønsted</td><td>donneur H⁺</td><td>accepteur H⁺</td></tr></table>
+<ul><li>Couples HA/A⁻ (CH₃COOH/CH₃COO ; NH₄/NH₃ ; H₃O⁺/H₂O ; H₂O/OH⁻). Eau ampholyte. Neutralisation : H₃O + OH⁻ → 2H₂O. Autoprotolyse : 2H₂O ⇌ H₃O⁺ + OH⁻ ; [H₃O⁺][OH⁻] = 10⁻¹⁴. pH = −log[H₃O⁺] ; &lt;7 acide, 7 neutre, &gt;7 basique ; 1 unité = ×10. Acide fort (HCl, HNO₃, H₂SO₄) → ; faible (CH₃COOH, HF) ⇌. pKa petit = acide fort ; pKa grand = base conjuguée forte.</li>
+<li>Échelle : suc gastrique · citron/cola · vinaigre · café · pluie · eau pure (7) · sang (7,4) · eau mer · savon · ammoniaque · soude.</li></ul>
+<h5>Exercices résolus</h5>
+<ul><li>CH₃COOH + H₂O ⇌ CH₃COO⁻ + H₃O⁺ (faible, double flèche). Couples : HCO₃⁻/CO₃²⁻ 10,3 · HSO₃⁻/SO₃²⁻ 7,2 · HF/F⁻ 3,2 → acide + fort : <b>HF</b> ; base + forte : <b>CO₃²⁻</b> ; réaction : HF + CO₃²⁻ → F⁻ + HCO₃. Vérifier table fournie.</li>
+<li>pH : [H₃O⁺]=10⁻³ → pH 3 · HCl 0,01 → pH 2 · NaOH 10⁻³ → [OH⁻]=10⁻³ → [H₃O⁺]=10⁻¹¹ → pH 11.</li></ul>
+<ul><li><b>Oxydoréduction :</b> oxydation = perte e⁻ (réducteur oxydé) ; réduction = gain e⁻ (oxydant réduit) ; « le réducteur donne ». Couples Ox/Red. E° haut = oxydant fort ; E° bas = réducteur fort. Spontané : oxydant fort + réducteur fort (règle du gamma). Clou Fe dans CuSO₄ : Fe + Cu²⁺ → Fe²⁺ + Cu.</li></ul>
+<h5>Pile Fe-Cu (q21 2024-25, 11 pts)</h5>
+<ul><li>Anode (−) oxydation : Fe → Fe²⁺ + 2e⁻ · Cathode (+) réduction : Cu²⁺ + 2e⁻ → Cu · E°(Fe²⁺/Fe) = −0,44 &lt; E°(Cu²⁺/Cu) = +0,34 · bilan : Fe + Cu²⁺ → Fe²⁺ + Cu.</li>
+<li><b>Rôle pont salin :</b> à l'anode apparaissent ions + (compartiment chargé +) ; à la cathode disparaissent Cu²⁺ (excès SO₄²⁻). Le pont rétablit l'électroneutralité : Cl⁻ → anode, K⁺ → cathode. Sans pont : charges s'accumulent, courant s'arrête, lampe s'éteint.</li>
+<li><b>Corrosion :</b> Fe + O₂ + eau → rouille (+ vite avec sel). Protections : peinture, graissage, galvanisation (zinc), anode sacrificielle (Zn/Mg), étamage, inox.</li></ul>
+</div></details>
+
+<details><summary>🧬 BIO · B4 SANTÉ (le + gros bloc)</summary><div class="in">
+<h4>Défenses de l'organisme</h4>
+<ul><li>Micro-organismes : bactéries, virus, champignons, parasites ; pathogènes ou non (flore). Antigène = molécule étrangère. Barrières : peau, muqueuses, mucus, larmes, acidité estomac, flore.</li>
+<li><b>1 Innée</b> (non spécifique, immédiate) : inflammation (rougeur, chaleur, gonflement, douleur) + phagocytose (macrophages) ; fièvre ralentit microbes.</li>
+<li><b>2 Acquise</b> (spécifique, lente) : humorale = lymphocytes B → plasmocytes → anticorps (complexe immun, neutralise toxines/microbes circulants) ; cellulaire = T cytotoxiques détruisent cellules infectées ; T4 coordonnent ; VIH détruit T4 → sida.</li>
+<li><b>3 Mémoire :</b> lymphocytes mémoire → réponse secondaire rapide/forte/durable.</li></ul>
+<table><tr><th></th><th>Vaccination</th><th>Sérothérapie</th></tr>
+<tr><td>On injecte</td><td>antigène inoffensif (tué/atténué, anatoxine)</td><td>anticorps déjà fabriqués (sérum)</td></tr>
+<tr><td>Immunité</td><td>active (fabrique + mémoire)</td><td>passive (empruntée)</td></tr>
+<tr><td>Délai/durée</td><td>lente, durable (rappels)</td><td>immédiate, temporaire</td></tr>
+<tr><td>Usage</td><td>prévention</td><td>urgence (morsure, tétanos)</td></tr></table>
+<h5>Méthode cobayes (2024-25, 10 pts)</h5>
+<ul><li>Toxine seule → pas d'anticorps à temps → meurt. Anatoxine puis toxine → anticorps + mémoire → réponse secondaire rapide → survit (vacciné). Sérum immunisé + toxine → anticorps tout faits → survit (passif). Diphtérie = défense <b>humorale</b> (anticorps neutralisent toxine circulante ; transfert sérum sans cellules suffit). Aussi : transmissions (air, contact, sang, sexuelle/VIH) ; rejet greffe (T reconnaissent greffon ; immunosuppresseurs) ; rappels entretiennent mémoire.</li></ul>
+<h4>Système nerveux</h4>
+<ul><li>Central : encéphale (cerveau, cervelet, tronc) + moelle (crâne, colonne, méninges, LCR). Périphérique : nerfs crâniens/rachidiens, sensitifs/moteurs. Chaîne : stimulus → récepteur → nerf sensitif → centre → nerf moteur → effecteur.</li>
+<li>Neurone : dendrites, corps cellulaire, axone, myéline, terminaisons. Influx électrique ; synapse → neurotransmetteurs dans fente → récepteurs. Psychotropes (alcool, drogues) perturbent transmission (imitent/bloquent, empêchent recapture) ; tolérance, dépendance. Sommeil : perturbé par écrans/caféine/stress ; indispensable mémoire/récupération.</li></ul>
+<h4>Reproduction, grossesse, contraception</h4>
+<ul><li>Puberté : hypothalamus → hypophyse → gonades. Homme : testicules (spermatozoïdes + testostérone) commandés par FSH/LH ; testostérone freine en retour (rétrocontrôle).</li>
+<li>Chaîne femme : hypothalamus GnRH → hypophyse FSH/LH → ovaires (œstrogènes, progestérone) → utérus (endomètre) ; rétrocontrôle.</li>
+<li><b>Cycle ovarien :</b> folliculaire (follicule mûrit, œstrogènes) → ovulation ±J14 (pic LH) → lutéale (corps jaune, progestérone+œstrogènes). <b>Cycle utérin :</b> règles J1-J5 → épaississement endomètre → prêt nidation ; sans fécondation corps jaune dégénère → règles.</li>
+<li>Fécondation trompe → nidation ±7 j → embryon (≤8 sem) → fœtus → ±9 mois. <b>Grossesse :</b> trophoblaste → hCG → maintient corps jaune → progestérone → pas de règles ; fin 3 mois placenta prend relais ; tests = hCG.</li>
+<li>Placenta/unité fœto-placentaire : échanges sans mélange (nutriments/O₂ → fœtus ; déchets/CO₂ → mère), sécrétions, barrière partielle · cordon (artères+veine) · amnios/liquide (chocs, T°).</li></ul>
+<h5>Profils hCG (2024-25, 3 pts)</h5>
+<ul><li>Supérieurs dès J15 (300 vs 130 ; 110 000 vs 57 000) → <b>jumeaux</b>. Normal puis stagne (2500→2600) → <b>GEU</b>. Normal puis s'effondre (28 000→100) → <b>fausse couche</b>. Suivi : test, échographie, choriocentèse, amniocentèse (caryotype). Ménopause ±50 ans.</li></ul>
+<table><tr><th>Méthode</th><th>Principe</th></tr>
+<tr><td>Pilule œstroprogestative</td><td>bloque ovulation par rétrocontrôle</td></tr>
+<tr><td>Pilule lendemain</td><td>retarde/bloque ovulation</td></tr>
+<tr><td>Préservatif</td><td>barrière ; seul contre IST</td></tr>
+<tr><td>Stérilet</td><td>empêche nidation (cuivre gêne spermatozoïdes)</td></tr>
+<tr><td>Contragestion</td><td>empêche nidation/élimine embryon</td></tr>
+<tr><td>IVG</td><td>dépénalisée BE 1990</td></tr>
+<tr><td>PMA</td><td>insémination, FIV</td></tr></table>
+</div></details>
+
+<details><summary>🧬 BIO · B5 GÉNÉTIQUE/ÉVOLUTION + B6 ÉCOSYSTÈMES</summary><div class="in">
+<h4>B5 · Du gène à la protéine</h4>
+<ul><li>Phénotype 3 échelles (macro, cellulaire, moléculaire) ; génotype = allèles. ADN double hélice (A-T, C-G), noyau ; gène = portion codant protéine ; allèle = version. ARN 1 brin (U remplace T) : ARNm, ARNt, ribosomes.</li>
+<li>Transcription (noyau) : brin TAC AAA CCG ATT → ARNm AUG UUU GGC UAA. Traduction (cytoplasme, ribosomes, ARNt) → Met-Phe-Gly (UAA stop). Code universel + redondant ; table fournie.</li></ul>
+<h5>Méthode q24 (2024-25, 8 pts)</h5>
+<ul><li>Titre « La synthèse des protéines » · étape 1 transcription (noyau) · étape 2 traduction (cytoplasme/ribosomes) · molécules ADN, ARNm, protéine (ou ARNt/acide aminé) · séquence : ARNm complémentaire (A→U, T→A, C→G, G→C), codons dès AUG, lire table.</li>
+<li>Mutation (substitution/délétion/insertion) → peut changer protéine/phénotype. Germinale = transmise ; somatique = non (cancers). Maladie génétique = allèle muté (mucoviscidose, drépanocytose, hémophilie, daltonisme) ; chromosomique = caryotype (trisomie 21). Environnement influence (bronzage, taille).</li></ul>
+<h4>Hérédité et arbres</h4>
+<ul><li>Arbre : □ homme, ○ femme, noirci = atteint, générations romains. 2 parents sains + enfant atteint → récessif. Hommes atteints via mères saines → lié X.</li>
+<li><b>Daltonisme (X récessif) :</b> XN/Xn. Homme XNY sain, XnY daltonien ; femme XNXN, XNXn porteuse, XnXn daltonienne. Y ne porte pas le gène. Croisement XNXn × XNY → atteint 1/4 ; garçon atteint 1/2 ; aucune fille atteinte.</li></ul>
+<table><tr><th>Affirmation 2024-25</th><th>Réponse</th></tr>
+<tr><td>Fils d'une mère porteuse obligatoirement daltonien</td><td>Faux : 1/2</td></tr>
+<tr><td>Femme daltonienne a père daltonien</td><td>Vrai : Xn du père (XnY)</td></tr>
+<tr><td>Fils d'un homme daltonien obligatoirement daltonien</td><td>Faux : fils reçoit Y</td></tr>
+<tr><td>Fils d'une femme daltonienne tous daltoniens</td><td>Vrai : ne transmet que Xn</td></tr>
+<tr><td>Fille d'un homme daltonien obligatoirement porteuse</td><td>Vrai : reçoit Xn</td></tr></table>
+<ul><li>ABO : A/B codominants, O récessif ; A = AA/AO, B = BB/BO, AB, OO ; AO×AO → O 1/4. Autosomique récessive Aa×Aa → 1/4 atteints.</li>
+<li><b>Biotechnologies :</b> universalité du code → gène humain dans bactérie (insuline, hormone croissance) ; OGM ; thérapie génique.</li></ul>
+<h4>Évolution</h4>
+<ul><li>Espèce = individus semblables, descendance fertile ; spéciation (isolement). Diversité : mutations + brassage (méiose, fécondation). Sélection naturelle (Darwin 1859 : caractères avantageux → survie/reproduction ; phalène, bactéries résistantes). Dérive (hasard, petites populations). Néodarwinisme = mutations+brassage+sélection+dérive. Écartés : fixisme, créationnisme, lamarckisme.</li>
+<li>Parenté : anatomique (membres homologues), embryologique, moléculaire (séquences), paléontologique. Arbre phylogénétique : innovations partagées, nœuds = ancêtres communs ; Homme ne descend pas du chimpanzé (ancêtre commun ±7 Ma).</li>
+<li><b>Lignée humaine :</b> Toumaï 7 Ma · Orrorin 6 · Ardipithecus 4,4 · Lucy 3,2 · habilis 2,4 (outils) · erectus 1,9 (sort Afrique) · Néandertal 400 ka · sapiens 300 ka (Afrique). Buissonnant (coexistences). Bipédie : trou occipital, bassin large/court, colonne S, fémur oblique ; volume crânien ↑, face réduite, mâchoire parabole, pouce opposable.</li>
+<li>Chronologie vie : Terre 4,6 Ga · vie 3,5 Ga · pluricellulaires 600 Ma · sortie eaux 400 Ma · dinosaures jusqu'à 66 Ma · Homo 2,5 Ma · sapiens 300 ka.</li></ul>
+<h4>B6 · Impacts sur les écosystèmes</h4>
+<ul><li>Écosystème = biotope + biocénose. Biodiversité = écosystèmes + espèces + gènes. Chaîne : producteurs → consommateurs I → II/III → décomposeurs (recyclent en sels minéraux).</li>
+<li><b>5 causes diminution :</b> surexploitation · fragmentation habitats · pollution · invasions · changements climatiques.</li>
+<li>Empreinte écologique (surface nécessaire ; pays riches &gt; capacité planète) · services écosystémiques (production, régulation, bien-être) · menacées BE : tétras-lyre, cigogne noire · invasives : balsamine, berce du Caucase, coccinelle asiatique, Caulerpa · actions : maillages vert/bleu, pâturage pelouses calcaires, LIFE/Natura 2000, points chauds, sylviculture diversifiée.</li>
+<li><b>Agriculture intensive :</b> rendement max/ha via intrants, monocultures, sans haies.</li></ul>
+<h5>Plan texte argumenté (2024-25, 14 pts : agriculture intensive et oiseaux)</h5>
+<ul><li>Intro : définir + annoncer lien oiseaux/écosystème · Analyse graphique : chiffres précis (déclin + fort en milieu agricole ; comparer) · Causes : néonicotinoïdes (neurotoxiques, persistants → insectes morts → oiseaux insectivores sans nourriture ; bioaccumulation) ; disparition haies (abri, nidification) ; monocultures (− graines/insectes) · Conséquences maillons : producteurs (− pollinisation/dispersion) · consommateurs (pullulation ravageurs/rongeurs sans prédateurs) · décomposeurs (− charognards → décomposition lente, maladies) · Conclusion : effet en cascade ; ouverture alternatives (haies, bio, interdiction néonicotinoïdes UE). Grille : respect sujet, reformulation personnelle (copier-coller sanctionné), organisation, soin.</li></ul>
+</div></details>
+
+<details><summary>🧭 CODEX STRATÉGIQUE · M1-M8</summary><div class="in">
+<h4>M1 · Souveraineté</h4>
+<ul><li><b>ADNV :</b> U(x) = α·Deng + β·LKY + γ·Ford + δ·Carnegie + ε·Buffett. Rejet si ne maximise pas échelle (γ) + allocation (ε) sous contrainte institutionnelle (β). Deng : pragmatisme, production d'abord · LKY : méritocratie, tolérance zéro · Ford : standardisation, coût unitaire · Carnegie : intégration verticale · Buffett : horizon long, cercle de compétence.</li>
+<li><b>Hub Benelux :</b> FR/NL/EN = monopole informationnel tri-frontalier ; arbitrer flux Wallonie↔Flandre↔NL ; fonds Interreg via structure Maastricht ; internationalisation PME wallonnes.</li>
+<li><b>Asymétrie :</b> P = (W_priv / I_pub) × C. Sans patrimoine, fonction publique = servitude. Capital = armure qui finance le « non ».</li></ul>
+<h4>M2 · Académique</h4>
+<ul><li>Jury : S1-4 diagnostic (3 blancs/matière) · S5-8 Anki + 50 problèmes/j · S9-12 annales chronométrées. Brouillon 20/80, structure I/A/1/a.</li>
+<li>Langues : lun 9-17 (NL matin, EN ap-m) ; mar-ven 9-13 alterné ; soir 30 min Anki vocab éco ; Zone 2 = shadowing NL/EN.</li>
+<li>Maastricht PBL : chairman/scribe dès tutoriel 1 ; 1 question master/séance + papier récent ; cibles MSIF + Debating Society. Ère I : CESS distinction, top 10%, EN C1, NL B2-C1, cash-flow 1000€/mois, 50 contacts.</li></ul>
+<h4>M3 · Finances & fiscalité BE</h4>
+<ul><li>Base 582€ (364 ETF + 217 liquidités). DCA 100€ → 500€ post-SGS. SGS 6700 + 150×±12 ≈ 8500€. Allocation : 40% ETF · 30% urgence · 20% business · 10% études.</li>
+<li>ETF accumulants (VWCE/SWDA) : pas de dividende taxé 30%. Art. 90 CIR92 : plus-values exonérées si « bon père de famille » (pas levier, pas day-trading, pas dérivés, &gt;1 an). TOB 1,32% achat/vente accumulants → grouper trimestriel 300€ si frais &gt;1€. Reynder N/A (100% actions). TCT seuil 1 M€.</li>
+<li>FV = PV(1+r)ⁿ + PMT·[((1+r)ⁿ−1)/r] ; 500€/mois @8% 10 ans ≈ 91 500€.</li>
+<li>Business : automatisation B2B (500€ setup + 150€/mois/client ; 5 clients = 750€/mois) · courtage subventions/marchés publics (5-10%) · coaching Jury (300€/4 sem).</li></ul>
+<h4>M4 · Corps & cognition (1m69 / 74 kg)</h4>
+<ul><li>Split : lun lower+core · mar pull+nuque (harnais 3×15) · mer Zone 2 50 min · jeu push+élévations latérales (V-taper) · ven Zone 2 · sam full lourd+anneaux · dim repos. Zone 2 : 150-180 min/sem, FC 140-155.</li>
+<li>Végétarien : 133 g protéines/j (tofu, tempeh, seitan, lentilles, quinoa, œufs/laitages) · B12 2,4 µg/j obligatoire · créatine 5 g · oméga-3 algues 2 g · jeûne 16/8 (12h-20h). SGS : caféine/alcool interdits → jeûne + L-théanine si autorisée.</li>
+<li>Sommeil 22:00-05:30, chambre 18°C, zéro écran 21:30. Deep Work 05:45-07:30 + 14:00-16:00 (mar-ven) ≈ 15 h/sem.</li></ul>
+<h4>M5 · Trajectoire</h4>
+<ul><li>Ère I (21-25) Forge : CESS, Maastricht, trilingue, cash-flow, NW 20-50 k€, 50 contacts. Ère II (25-35) Empire : entreprise scalable, NW 2 M€, think tanks (Itinera, Bruegel, Egmont), actif→passif. Ère III (35-45) État : cabinet, BNB, fonds souverain/régulateur UE, réformes via indépendance financière.</li></ul>
+<h4>M6 · Risques & DECISA</h4>
+<ul><li>5 pièges : dérive budgétaire (vivre 60/investir 40) · plateau NL (CNaVT Educatif 24 ans) · free-rider PBL (cas à 200%) · biais confirmation (mentor cynique) · burn-out (cycles ultradiens). DECISA = bouton rouge : H0-24 physio · H24-48 env · H48-72 strat.</li></ul>
+<h4>M7 · KPIs dominicaux</h4>
+<ul><li>DW 15 h · langues hors cours 5 h · DCA oui/non · sommeil ≥8/10 · Zone 2 150 min · PBL/réseau ≥8/10 · ΔNW &gt;0 · diète ≥95% · lecture 200 p · revenu actif ≥250€. Moyenne &lt;8/10 → DECISA.</li></ul>
+<h4>M8 · Semaine d'enclenchement</h4>
+<ul><li>J1 jeu 17 : emails profs SGS + courtier + DCA + coucher 22h · J2 ven 18 : screening Edegem + DW2 · J3 sam 19 : DW 3h + ITM 13-19:15 · J4 dim 20 : revue KPI + meal prep + trousse + cartes ×2 · J5 lun 21 : cours 9-17 + dates-clés soir + trousse/CI 21:30 · J6 mar 22 : ÉPREUVE FHG + débrief · J7 mer 23 : debrief + plan rattrapage SGS · J8 jeu 24 : ÉPREUVE SCI (5 éléments, unités, orthographe).</li></ul>
+</div></details>
+</div>
+
+<!-- ============ SUIVI ============ -->
+<div class="view" id="v-sui">
+  <div class="g"><span class="lbl grn">JOURNAL FINANCIER</span><div style="margin-top:10px"></div>
+    <div class="grid2"><div><label>Montant €</label><input type="number" id="fin-amt" inputmode="decimal" placeholder="0"></div>
+    <div><label>Catégorie</label><select id="fin-cat"><option>SGS</option><option>DCA</option><option>MISSION</option><option>BUSINESS</option><option>DÉPENSE</option></select></div></div>
+    <button class="btn gho sm" onclick="app.addFin()">ENREGISTRER</button>
+    <div id="fin-list" style="margin-top:8px"></div>
+  </div>
+  <div class="g"><span class="lbl">REVUE KPI · DIMANCHE</span><div style="margin-top:10px"></div>
+    <div class="grid2">
+      <div><label>DW h /15</label><input type="number" id="k-dw" inputmode="decimal"></div>
+      <div><label>Sommeil /10</label><input type="number" id="k-sl" inputmode="decimal"></div>
+      <div><label>Zone2 min /150</label><input type="number" id="k-z2" inputmode="decimal"></div>
+      <div><label>Langues h /5</label><input type="number" id="k-lg" inputmode="decimal"></div>
+    </div>
+    <label>Pages /200</label><input type="number" id="k-pg" inputmode="decimal">
+    <button class="btn gho sm" onclick="app.saveKPI()">SAUVEGARDER LA SEMAINE</button>
+    <div id="kpi-hist" style="margin-top:8px"></div>
+  </div>
+  <div class="g soft"><span class="lbl">SAUVEGARDE</span><div class="row" style="margin-top:10px"><button class="btn gho sm" onclick="app.backup()">BACKUP</button><button class="btn gho sm" onclick="app.restore()">RESTORE</button></div></div>
+</div>
+</main>
+
+<nav>
+  <button class="on" onclick="app.nav('today',this)"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h5v-6h4v6h5V10"/></svg>TODAY</button>
+  <button onclick="app.nav('rev',this)"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="14" height="12" rx="3"/><path d="M7 3h11a3 3 0 0 1 3 3v9"/></svg>RÉVISER</button>
+  <button onclick="app.nav('agd',this)"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="16" rx="4"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>AGENDA</button>
+  <button onclick="app.nav('cdx',this)"><svg viewBox="0 0 24 24"><path d="M4 19V5a2 2 0 0 1 2-2h14v16H6a2 2 0 0 0-2 2z"/><path d="M4 19a2 2 0 0 0 2 2h14"/></svg>CODEX</button>
+  <button onclick="app.nav('sui',this)"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg>SUIVI</button>
+</nav>
+
+<div class="ovl" id="ovl" onclick="if(event.target===this)app.decisa(0)">
+  <div class="sheet">
+    <h2>DECISA · FAILSAFE 72H</h2>
+    <div class="sub">Déclencheurs : échec académique · burn-out · chute motivation · dérive budgétaire</div>
+    <h4>H00 → H24 · Reset physiologique</h4><ul><li>Jeûne 24h (eau + électrolytes) — reset dopaminergique</li><li>Sommeil 9h minimum</li><li>Zéro écran, zéro réseau, zéro input</li><li>Marche forêt 2h</li></ul>
+    <h4>H24 → H48 · Reset environnemental</h4><ul><li>Nettoyage radical espace vie/travail</li><li>Digital declutter total</li><li>Verrou accès impulsifs (trading, achats)</li></ul>
+    <h4>H48 → H72 · Reset stratégique</h4><ul><li>Battle plan 1 page, SUR PAPIER</li><li>3 priorités absolues</li><li>Reprise protocole Jour 4 à 05:00</li></ul>
+    <div style="margin-top:18px"><button class="btn red" onclick="app.decisa(0)">FERMER ET EXÉCUTER</button></div>
+  </div>
+</div>
+
+<script>
+const DB={
+fhg_dates:[["1830","Indépendance de la Belgique (révolution contre les Pays-Bas)."],["1831","Constitution : libertés, monarchie parlementaire, vote censitaire (~1%)."],["1885","Fin conférence de Berlin → EIC (Léopold II) ; fondation POB."],["1886","Émeutes ouvrières Wallonie, répression sanglante."],["1893","Suffrage universel masculin tempéré vote plural ; grève générale."],["1908","15/11 : Belgique reprend le Congo → Congo belge."],["4/08/1914","Invasion allemande (Schlieffen) ; RU entre en guerre."],["11/11/1918","Armistice."],["1919","Versailles (28/6) ; suffrage universel masculin pur BE."],["10/1917","Révolution bolchevique (Lénine)."],["24/10/1929","Krach Wall Street → dépression."],["30/01/1933","Hitler chancelier (voie légale)."],["1936","Rex 21 sièges ; Rhénanie ; guerre Espagne."],["1938","Anschluss ; Munich ; Nuit de cristal."],["1/09/1939","Pologne → 2GM."],["10 & 28/05/1940","Invasion BE ; capitulation armée ; Pierlot Londres."],["20/01/1942","Wannsee : solution finale."],["8/05/1945","Capitulation allemande."],["1947","Truman + Marshall."],["1949","OTAN ; RFA/RDA."],["9/05/1950","Déclaration Schuman."],["1957","Rome : CEE + Euratom."],["30/06/1960","Indépendance Congo."],["17/01/1961","Assassinat Lumumba."],["1962-63","Frontière linguistique ; Algérie indépendante."],["1973","1er choc pétrolier."],["9/11/1989","Chute mur Berlin."],["1992-93","Maastricht ; BE fédérale (art.1)."],["2002","Euro fiduciaire ; euthanasie BE."],["2004","Élargissement 25."],["2020","Brexit ; Covid ; commission coloniale."]],
+fhg_outils:[["1 Colonisation","Prise contrôle territoire (domine/administre/exploite). Étapes : exploration→conquête→organisation→exploitation. Ex : EIC 1885."],["2 Décolonisation","Accès indépendance ; néocolonialisme = domination autrement (éco/armée/culture). Ex : Congo 1960 + Katanga."],["3 Impérialisme","Étendre domination avec/sans annexion. Moyens : armée, capitaux, culture. Ex : partage Afrique."],["4 Migration","Déplacement durable. Répulsifs/attractifs, volume, type. Ex : 50-60 M Européns 1815-1914."],["5 Cap/Coll","Cap : privé, marché, profit, salariat. Coll : État, planification, prix fixés. New Deal = régulé."],["6 Croissance/Dév","PIB (quantitatif) vs bien-être IDH (qualitatif). Ex : Trente Glorieuses ; Chine inégalitaire."],["7 Sous-dév","Besoins essentiels non satisfaits durablement. IDH, mortalité infantile, dépendance. Ex : PMA."],["8 Lib/Soc/Com","4 critères : individu, État, propriété, moyens. Libéral libertés ; socialiste réformes ; communiste révolution."],["9 Stratifications","Hiérarchie groupes (ordres, classes, castes, races). Mobilité ou non. Ex : apartheid."],["10 Crise","Rupture brutale équilibre. Déclencheur, causes, extension, solutions. Ex : 1929, 2008."],["11 Cons/Réform","Conserver ordre vs changer par loi. ≠ révolutionnaire/réactionnaire."],["12 Juridique","Lois ↔ droits. Citoyen ? égalité ? garanties ? Ex : 1831, Nuremberg, 1948."],["13 Démocratie","Souveraineté, élections libres, suffrage universel, séparation, État droit, alternance."],["14 Autor/Total","Autoritaire : pouvoir concentré. Totalitaire : contrôle TOTAL (parti, terreur, propagande, jeunesse, culte)."],["15 Nat/Féd/Univ","Nation d'abord / entités autonomes unies / valeurs pour tous. Ex : BE 1993 ; ONU."],["16 Humanisme","Humain, dignité, raison ; tolérance, libre examen. Ex : ULB, Déclaration 1948."],["17 Religion/Société","Séparation, financement, influence lois, piliers. Ex : pacte 1958, Rerum Novarum."],["18 Art/Société","Œuvre exprime/sert/critique société. Ex : Guernica, Tintin au Congo, réalisme socialiste."]],
+fhg_geo:[["Aléa×Vulnérabilité","= Risque. Catastrophe si dégâts majeurs. Résilience = relever ; résistance = prévenir."],["Haïti vs Chili 2010","7,0 → 200 000 morts vs 8,8 → ±500. Différence = vulnérabilité."],["Énergie prim/sec","Primaire nature ; secondaire transformée. Fossiles ≈80% (pétrole 32, charbon 26, gaz 23)."],["Points stratégiques","Ormuz (1/5 pétrole), Malacca, Suez, Bab el-Mandeb, Bosphore."],["Cobalt/Lithium/TR","Cobalt RDC 70% ; lithium triangle + Australie ; terres rares Chine raffinage."],["Magnitude≠Intensité","Énergie libérée (log) vs effets (I-XII). Foyer ≠ épicentre."],["Effusive/Explosive","Laves fluides (Hawaï) vs nuées ardentes (ceinture feu Pacifique)."],["Cyclone","Océan >26°C, 5-20° lat, >118 km/h. Ouragan/typhon/cyclone. Saffir-Simpson 1-5."],["ZCIT/30°/60°","Équateur pluies ; 30° anticyclones → déserts ; 60° fronts → pluies Europe."],["Centre/Périphérie","Centre concentre ; périphéries intégrées/délaissées. Triade/Suds ; BE centrale/marges."],["Auréolaire","Couronnes : centre, banlieue, périurbain. Densité/prix décroissent."],["Réticulaire","Nœuds + axes + flux. Autoroutes BE centrées Bruxelles."],["Affectation≠Utilisation","Autorisé par plan (juridique) vs occupation réelle. Plan contraignant ≠ schéma orientations."],["Conflit d'usage","Fonctions incompatibles même espace. Analyser : fonctions, acteurs, arguments, arbitrage."],["Carte 5 éléments","Titre complet (info+territoire+date), nord, légende rubriques, échelle, sources."],["Figurés","Ponctuels cercles (absolus) ; linéaires épaisseur (intensité) ; plages ordonnées (relatifs %). Absolu en plages = ERREUR."],["Belgique 3 phrases","Centre dense (Bruxelles+losange) ; sillon reconversion ; Ardenne peu peuplée."],["15 aires monde","Tokyo, Delhi, Shanghai, São Paulo, Mumbai, Mexico, Beijing, Osaka, Caire, NY, Dhaka, Karachi, BA, Kolkata, Istanbul."]],
+fhg_meth:[["Barème histoire","Pertinence /10 + fiabilité /16 + synthèse /45 = /71 → /20. Synthèse = 63%."],["3 règles d'or","Critique = corpus seul. Synthèse = savoirs extérieurs + citation (doc.n). Intro ≥2 éléments contexte sinon 0."],["Pertinence 4 étapes","Problématique (thème/lieu/date) → document (thème/lieu/date faits) → comparer → conclure + variable décisive."],["Pièges pertinence","Titre ouvrage ≠ thème. Date réalisation ≠ date faits. Delacroix 1830 échoue sur date en dossier rév. ind."],["Fiabilité auteur","Contemporain ? témoin direct ? compétent ? objectif ? informe ou persuade ? veut nuire ?"],["Fiabilité document","Époque des faits ? institution réputée ? recoupé ? caricature ? reconstitution ? site sans sources ?"],["3 écarts","Contenu vs réalité connue · intentions vs réalisation · existence autres points de vue."],["Réflexes types","Témoignage précis mais subjectif · caricature opinion mais exagère · propagande un point de vue · loi dit doit être pas appliqué · statistique : source ? période ?"],["Carte d'identité stéréotypée","ZÉRO point. Chaque élément doit devenir argument."],["Synthèse structure","Titre thème+lieu+époque · intro accroche+contexte≥2+problématique+plan · ¶ = 1 idée + alinéa · conclusion réponse+ouverture."],["5 opérations","Permanence · processus évolutif · changement · synchronisme · hypothèse explicative."],["Gabarit ¶","Idée (1 phrase) → preuve (doc.n) → savoir extérieur → conséquence/lien."],["Connecteurs","car/en effet · donc/c'est pourquoi · cependant/en revanche · de plus/en outre · d'abord/ensuite."],["11 critères","Titre · objet respecté · pas d'inutile · sensé · docs+savoirs · pas résumé · pas erreur savoirs · organisation · 1 idée/¶ · lisible sans ratures · pas recopié."]],
+sci_phy:[["MRU/MRUA","MRU : v cte, x(t) droite, a=0. MRUA : a cte, v(t) droite (pente a), x(t) parabole, d=v̄t."],["Conversions","1 m/s = 3,6 km/h. nm→m ×10⁻⁹. min→s ×60. diamètre→rayon ÷2."],["Newton","1 inertie · 2 F=ma · 3 action-réaction. P=mg (9,81)."],["Chute","Vide : même g tous corps. Fluide : frottements → vitesse limite."],["MCU","Norme v cte ; direction v change → a≠0 centripète ⊥v. Sans force centripète : ligne droite."],["Sécurité","Distance arrêt = réaction + freinage (∝v²). Airbag allonge durée → force ↓. 90 km/h mur = h=v²/2g ≈32 m = 11 étages."],["Guépard résolu","18→126 km/h en 5 s : a=6 m/s² ; d=100 m."],["Onde","f=1/T ; v=λf ; c=3·10⁸ vide. Son 340 air. Transversale (S) vs longitudinale (P)."],["Phénomènes","Réflexion, réfraction, diffraction, interférences, résonance, Doppler."],["Sons","20-20 000 Hz. Hauteur=f ; intensité=dB (>85 danger) ; timbre=forme. Pur=sinusoïde, complexe=périodique, bruit=apériodique."],["Spectre EM","γ<X<UV<visible(400-780)<IR<micro<radio. λ↓ → f↑ énergie↑ (ionisants γ,X,UV)."],["Radioactivité","α papier · β alu · γ plomb. Conservations ΣA, ΣZ. A=A₀/2ⁿ. 800 Bq T8j →24j =100 Bq."],["Astate résolu","²¹²₈At → ²⁰⁸₈₃Bi + ⁴₂He (212=208+4 ; 85=83+2)."],["Fission/Fusion","Fission U235 chaîne (barres). Fusion H→He (Soleil, ITER). E=mc². Chaîne : nucl→therm→méca→élec."],["Rendement","η=utile/consommée <1. 1000/3000 ≈33%. Haute tension → pertes Joule ↓."],["Gravitation","F=GmM/d² ; g=GM/R² ; altitude GM/(R+h)². Martien 70 kg ≈254 N. 400 km ≈8,7 m/s²."],["Cosmos","Héliocentrisme ; Big Bang 13,8 Ga + expansion + rayonnement fossile. Voie lactée spirale 100 000 al. UA 150 M km."],["Terre","R 6400 km ; 78% N₂ 21% O₂. Effet serre naturel +15°C vs −18°C. Habitabilité : eau liquide, atmosphère, champ magnétique."]],
+sci_chi:[["ΔEN liaisons","0 pure · 0,4-1,7 polarisée · >1,7 ionique (métal+non-métal). H2,1 C2,5 N3,0 O3,5 F4,0 Na0,9 Cl3,0."],["5 espèces","H₂O coudée 104,5° polaire · CH₄ tétra 109,5° apolaire · NaCl ionique réseau · CO₂ linéaire apolaire · O₂ linéaire pure."],["Polarité molécule","= liaisons polarisées + géométrie. Centres δ+/δ− coïncident ? non=polaire (H₂O), oui=apolaire (CO₂,CH₄)."],["Eau solvant","Semblable dissout semblable. NaCl→Na⁺+Cl⁻ conducteur. CH₄/O₂ peu solubles. Filet eau dévié."],["Kc","[C]ᶜ[D]ᵈ/([A]ᵃ[B]ᵇ). Ni solides ni eau. T seule influence. ≫1 produits."],["Le Châtelier","+réactif→droite · +produit→gauche · P↑→moins moles gaz · chaud→endothermique · froid→exothermique."],["FeSCN méthode","Chauffer éclaircit → gauche → direct EXOthermique. Paliers = équilibre. T↑ → Kc↓ (exothermique)."],["HI résolu","[H₂]=[I₂]=0,10 ; [HI]=0,70 → Kc=49."],["Alcanes/alcènes","CₙH₂ₙ₊₂ / CₙH₂ₙ. Masse alcane 14n+2. 282 u → C₂₀H₄₂."],["Combustions","Complète CO₂+H₂O flamme bleue. Incomplète CO/C suie flamme jaune. Pondérer C,H,O. CO tueur silencieux."],["Pouvoir calorifique","H₂ 120-140 · gaz 50 · essence 45 · charbon 30 · bois 15-18 MJ/kg."],["Polymères","n CH₂=CH₂ → PE. Pictos 1 PET 2 PEHD 3 PVC 6 PS. Naturels : cellulose, amidon, ADN."],["Précipitation","AB₂ : bleu NaOH → Cu²⁺ ; blanc Ag⁺ → Cl⁻ → CuCl₂. Toujours solubles Na/K/NH₄/nitrates."],["Acides/bases","Arrhenius H⁺/OH⁻ ; Brønsted donneur/accepteur. Eau ampholyte. pH=-log[H₃O⁺]. 1 unité=×10."],["pKa","Petit=acide fort. HF 3,2 fort ; CO₃²⁻ base forte (10,3). HF+CO₃²⁻→F⁻+HCO₃⁻."],["pH résolus","10⁻³→3 · HCl 0,01→2 · NaOH 10⁻³→11."],["Redox","Oxydation=perte e⁻ ; réduction=gain. E° haut=oxydant fort. Règle gamma. Fe+Cu²⁺→Fe²⁺+Cu."],["Pile Fe-Cu","Anode− Fe→Fe²⁺+2e⁻ ; cathode+ Cu²⁺+2e⁻→Cu. Pont salin : Cl⁻→anode, K⁺→cathode ; sans = courant stop."],["Corrosion","Fe+O₂+eau→rouille (+sel). Protections : peinture, galvanisation, anode sacrificielle, inox."]],
+sci_bio:[["Innée vs acquise","Innée immédiate non spécifique (inflammation, phagocytose). Acquise lente spécifique (B→anticorps ; T cytotoxiques ; T4 coordonnent ; VIH→sida)."],["Mémoire","Réponse secondaire rapide/forte/durable (cellules mémoire)."],["Vaccin vs sérum","Vaccin=antigène, active, lente, durable, prévention. Sérum=anticorps, passive, immédiate, urgence."],["Cobayes méthode","Toxine seule→meurt. Anatoxine→toxine→survit (vacciné). Sérum+toxine→survit (passif). Diphtérie=humorale."],["Chaîne nerveuse","Stimulus→récepteur→nerf sensitif→centre→nerf moteur→effecteur. Synapse=électrique→chimique (neurotransmetteurs)."],["Cycles","Folliculaire (œstrogènes) → ovulation J14 (pic LH) → lutéale (corps jaune, progestérone). Utérin : règles J1-5 → endomètre."],["Grossesse hCG","Trophoblaste→hCG→corps jaune maintenu→progestérone→pas règles. 3 mois placenta relais. Tests=hCG."],["Profils hCG","↑↑ dès J15=jumeaux · stagne=GEU · s'effondre=fausse couche."],["Contraception","Pilule rétrocontrôle · lendemain retarde ovulation · préservatif seul IST · stérilet nidation · IVG 1990 · PMA FIV."],["ADN→protéine","Transcription noyau (TAC AAA CCG ATT → AUG UUU GGC UAA) · traduction ribosomes → Met-Phe-Gly. AUG début ; UAA/UAG/UGA stop."],["Mutations","Substitution/délétion/insertion. Germinale transmise ; somatique non. Génétique=allèle muté ; chromosomique=caryotype (trisomie 21)."],["Daltonisme","X récessif. XNXn×XNY → atteint 1/4 ; garçon 1/2 ; fille atteinte 0. Fille homme daltonien=porteuse."],["ABO","A/B codominants, O récessif. AO×AO→O 1/4. Aa×Aa→1/4 atteints."],["Biotech","Universalité code → gène humain dans bactérie (insuline). OGM, thérapie génique."],["Évolution","Mutations+brassage+sélection+drive=néodarwinisme. Écartés : fixisme, créationnisme, lamarckisme. Homme≠descend chimpanzé (ancêtre 7 Ma)."],["Lignée","Toumaï 7Ma · Lucy 3,2 · habilis 2,4 · erectus 1,9 · Néandertal 400ka · sapiens 300ka. Buissonnant. Bipédie : trou occipital, bassin large, colonne S."],["Écosystème","Biotope+biocénose. Producteurs→conso I→II/III→décomposeurs. 5 causes : surexploitation, fragmentation, pollution, invasions, climat."],["Agri intensive texte","Intro définir+lien · graphique chiffres · causes néonicotinoïdes/haies/monocultures · maillons producteurs/conso/décomposeurs · cascade+alternatives."]],
+sci_meth:[["5 éléments","Grandeur · formule · calcul · résultat · unité. Sinon 0."],["Modèle γ","λ=0,001nm=1·10⁻¹²m ; c=λf ⇒ f=c/λ=3·10²⁰ Hz."],["Citer vs justifier","Citer=mot bref. Justifier=raisonnement/formule+calcul/graphique/expérience. Affirmer≠justifier."],["Orthographe","Terme bio/chimie mal écrit=0 (trophoblaste, œstrogènes, lymphocyte, thiocyanate…)."],["Unités SI","km/h÷3,6 · nm×10⁻⁹ · min×60 · diamètre÷2 · g→kg."],["Verbes","Analyser, comparer, déduire, définir, décrire, déterminer, énoncer, expliquer, identifier, interpréter, justifier, schématiser."],["Temps","Branche solide d'abord · 55 min/branche · 15 min relecture. Dispense si 90/180 (3 branches présentées)."],["Jour J","Cadres · rien sur tableau périodique · QCM noircir · trousse transparente · CI+convocation."]]
+};
+const SGS=[["2026-09-18","Screening Edegem (3h, à jeun)","SGS"],["2026-10-13","D-3 Admission unité soir","SGS"],["2026-10-15","D-1 Unité PK","SGS"],["2026-10-16","D1 Unité PK","SGS"],["2026-10-18","D3 Sortie 11h","SGS"],["2026-10-23","D8 Visite matin à jeun","SGS"],["2026-10-29","D14 Admission soir","SGS"],["2026-10-30","D15 Unité PK","SGS"],["2026-10-31","D16 Sortie","SGS"],["2026-11-05","D21 Admission soir","SGS"],["2026-11-06","D22 Unité PK","SGS"],["2026-11-07","D23 Sortie","SGS"],["2026-11-12","D28 Admission soir","SGS"],["2026-11-13","D29 Unité PK","SGS"],["2026-11-14","D30 Sortie","SGS"],["2026-11-19","D35 Admission soir","SGS"],["2026-11-20","D36 Unité","SGS"],["2026-11-21","D37 Unité PK","SGS"],["2026-11-22","D38 Sortie","SGS"],["2026-11-27","D43 Visite à jeun","SGS"],["2026-12-09","D55 Admission soir","SGS"],["2026-12-10","D56 Unité","SGS"],["2026-12-11","D57 Unité PK","SGS"],["2026-12-12","D58 Sortie","SGS"],["2026-12-25","D71 Visite","SGS"],["2027-01-08","D85 Visite à jeun","SGS"],["2027-01-22","D99 Visite","SGS"],["2027-02-02","D110 Admission soir","SGS"],["2027-02-03","D111 Unité","SGS"],["2027-02-04","D112 Unité PK","SGS"],["2027-02-05","D113 Visite fin","SGS"],["2027-03-15","VD Visite finale 3h","SGS"]];
+const EXAMS=[["2026-09-22","ÉPREUVE FHG · 3h","EXAM"],["2026-09-24","ÉPREUVE SCIENCES · 3h","EXAM"]];
+const PROTO={
+EXAM_FHG:[["07:00","Lever, petit-déj léger, trousse vérifiée"],["08:30","Trajet centre (CI + convocation)"],["09:00","ÉPREUVE 3h : 5' lecture · 35' critique · 60' synthèse · 70' géo · 10' relecture"],["14:00","Débrief à chaud"],["16:00","Zone 2 40 min"],["20:00","Célébration contrôlée"]],
+EXAM_SCI:[["07:00","Lever, calculatrice testée"],["08:30","Trajet centre"],["09:00","ÉPREUVE 3h : branche solide d'abord · 55'/branche · 5 éléments par calcul"],["14:00","Débrief"],["16:00","Zone 2"],["20:00","Repos"]],
+SGS:[["07:00","Trajet Edegem (150€/aller) · docs + jeûne si consigne"],["09:00","Protocole SGS"],["--:--","10 flashcards si fenêtre libre"],["18:00","Retour · repas 133g protéines"],["21:30","Coucher récupération"]],
+WORK:[["06:00","DW marathon 3h (téléphone avion)"],["09:30","Meal prep + courses"],["13:00","MISSION ITM TINLOT"],["19:30","Retour · dîner"],["20:30","Anki 20 min + journal 2 min"],["21:30","Coucher"]],
+MON:[["05:45","DW1 1h45 maths/éco"],["09:00","Cours NL 722"],["12:15","Cours EN 717"],["17:30","Force lower+core"],["20:00","Anki 30 min + revue"],["22:00","Coucher"]],
+WEEK:[["05:45","DW1 1h45 maths/éco"],["09:00","Cours NL/EN 9-13"],["14:00","DW2 2h FHG/Sci (2×10 cartes)"],["17:00","Entraînement split"],["20:00","Anki 30 min + lecture 40p"],["22:00","Coucher"]],
+SAT:[["06:00","DW marathon 3h"],["09:30","Meal prep végétarien"],["13:00","Missions / business (20 emails)"],["17:00","Full lourd + nuque"],["20:00","Cartes schématiques monde+BE"],["21:30","Coucher"]],
+SUN:[["08:00","Lever naturel"],["10:00","REVUE KPI + plan semaine (SUIVI)"],["12:00","Finances : journal + DCA"],["14:00","Lecture 2h / cartes géo"],["RESTE","Récupération totale"]]
+};
+const LS='codexOS_v4';
+let S=load();
+function load(){try{const r=localStorage.getItem(LS);if(r)return JSON.parse(r)}catch(e){}return{done:{},fin:[],kpi:[],ev:[],cards:{}}}
+function save(){try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}}
+const $=s=>document.querySelector(s);
+const iso=d=>d.toISOString().slice(0,10);
+const TODAY=iso(new Date());
+const dTo=d=>Math.ceil((new Date(d+'T00:00:00')-new Date(TODAY+'T00:00:00'))/864e5);
+const app={deck:'fhg_dates',idx:0,order:[],flipped:false,session:0,
+init(){$('#hdate').textContent=new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});$('#ev-date').value=TODAY;this.buildChips();this.loadDeck('fhg_dates');this.today();this.agenda();this.fin();this.kpiHist();},
+nav(v,el){document.querySelectorAll('.view').forEach(x=>x.classList.remove('on'));document.querySelectorAll('nav button').forEach(x=>x.classList.remove('on'));$('#v-'+v).classList.add('on');el.classList.add('on');document.querySelector('main').scrollTop=0;},
+dayType(){if(TODAY==='2026-09-22')return['EXAM_FHG','JOUR J · FHG'];if(TODAY==='2026-09-24')return['EXAM_SCI','JOUR J · SCIENCES'];if(SGS.some(e=>e[0]===TODAY))return['SGS','SGS · EDEGEM'];const evs=S.ev.filter(e=>e.date===TODAY);if(evs.some(e=>e.type==='WORK'))return['WORK','MISSION · TRAVAIL'];const d=new Date().getDay();if(d===1)return['MON','COURS · LUNDI PLEIN'];if(d===0)return['SUN','REVUE · DIMANCHE'];if(d===6)return['SAT','SAMEDI · DW+MISSIONS'];return['WEEK','COURS · MAR-VEN'];},
+today(){const[k,label]=this.dayType();const tasks=PROTO[k];$('#dtype').textContent=label;
+ const c1=dTo('2026-09-22'),c2=dTo('2026-09-24');$('#cd-fhg').textContent=c1>=0?'J-'+c1:'FAIT';$('#cd-sci').textContent=c2>=0?'J-'+c2:'FAIT';
+ const done=S.done[TODAY]||[];let ni=tasks.length-1;for(let i=0;i<tasks.length;i++){if(!done.includes(i)){ni=i;break}}
+ const nx=tasks[ni];$('#na-label').textContent=nx[1];$('#na-sub').textContent=(done.length>=tasks.length?'Protocole complet. Récupération.':'Début '+nx[0]+' · '+done.length+'/'+tasks.length+' tâches faites');
+ $('#na-tags').innerHTML='<span class="tag wr">'+label+'</span><span class="tag wo">'+tasks.length+' tâches</span><span class="tag ok">'+Math.round(done.length/tasks.length*100)+'%</span>';
+ $('#tasks').innerHTML=tasks.map((t,i)=>'<div class="ck '+(done.includes(i)?'done':'')+'" onclick="app.tick('+i+')"><span class="box"></span><span class="tm">'+t[0]+'</span><span class="tx">'+t[1]+'</span></div>').join('');
+ const nw=582+S.fin.reduce((a,f)=>a+(f.cat==='DÉPENSE'?-f.amt:f.amt),0);const sgs=S.fin.filter(f=>f.cat==='SGS').reduce((a,f)=>a+f.amt,0);
+ $('#s-nw').textContent=nw+'€';$('#s-sgs').textContent=sgs+'€';
+ const total=Object.values(DB).reduce((a,d)=>a+d.length,0);const doneC=Object.values(S.cards).reduce((a,c)=>a+(c.done||0),0);const flag=Object.values(S.cards).reduce((a,c)=>a+(c.flagged||[]).length,0);
+ const pct=Math.min(100,Math.round(doneC/total*100));$('#m-pct').textContent=pct+'%';$('#m-bar').style.width=pct+'%';$('#m-txt').textContent=doneC+' cartes acquises / '+total+' · '+flag+' en file';},
+tick(i){const d=S.done[TODAY]=S.done[TODAY]||[];const p=d.indexOf(i);p<0?d.push(i):d.splice(p,1);save();this.today();},
+buildChips(){const names={fhg_dates:'FHG DATES',fhg_outils:'18 OUTILS',fhg_geo:'FHG GÉO',fhg_meth:'FHG MÉTHODE',sci_phy:'SCI PHYS',sci_chi:'SCI CHIM',sci_bio:'SCI BIO',sci_meth:'SCI MÉTHODE'};
+ $('#deck-chips').innerHTML=Object.keys(DB).map(k=>'<button class="chip" data-k="'+k+'" onclick="app.loadDeck(\''+k+'\',this)">'+names[k]+'</button>').join('');},
+loadDeck(k,el){this.deck=k;this.idx=0;this.session=0;const st=S.cards[k]=S.cards[k]||{flagged:[],done:0};const all=DB[k].map((_,i)=>i);const fl=st.flagged.filter(i=>all.includes(i));this.order=fl.concat(all.filter(i=>!fl.includes(i)));document.querySelectorAll('#deck-chips .chip').forEach(c=>c.classList.toggle('on',c.dataset.k===k));this.renderCard();},
+renderCard(){const c=DB[this.deck][this.order[this.idx]];$('#fcard').classList.remove('flip');this.flipped=false;setTimeout(()=>{$('#f-cat').textContent=this.deck.replace('_',' · ').toUpperCase();$('#f-q').textContent=c[0];$('#f-a').textContent=c[1];$('#f-bar').style.width=Math.round(this.idx/this.order.length*100)+'%';$('#f-prog').textContent=(this.idx+1)+' / '+this.order.length+' · session '+this.session+'/10';},160);},
+flip(){$('#fcard').classList.toggle('flip');this.flipped=!this.flipped;},
+next(ok){const real=this.order[this.idx];const st=S.cards[this.deck];st.flagged=st.flagged.filter(x=>x!==real);if(!ok)st.flagged.push(real);else st.done=(st.done||0)+1;save();this.session++;
+ if(this.session>=10){alert('MICRO-SESSION TERMINÉE · 10 cartes. '+st.flagged.length+' en file. Ferme le téléphone.');this.session=0;this.loadDeck(this.deck);this.today();return}
+ if(this.idx+1<this.order.length){this.idx++;this.renderCard()}else{this.idx=0;this.loadDeck(this.deck)}},
+addEv(){const t=$('#ev-type').value,d=$('#ev-date').value,n=$('#ev-note').value;if(!d)return;S.ev.push({type:t,date:d,note:n});S.ev.sort((a,b)=>a.date<b.date?-1:1);save();$('#ev-note').value='';this.agenda();this.today();},
+agenda(){const rows=[];EXAMS.concat(SGS).forEach(e=>{if(dTo(e[0])>=-1)rows.push({d:e[0],l:e[1],t:e[2]})});S.ev.forEach(e=>{if(dTo(e.date)>=-1)rows.push({d:e.date,l:e.note||e.type,t:e.type})});rows.sort((a,b)=>a.d<b.d?-1:1);
+ const sgsD=SGS.map(e=>e[0]);
+ $('#agd-list').innerHTML=rows.slice(0,18).map(r=>{const cls=r.t==='EXAM'?'wr':r.t==='SGS'?'ok':r.t==='WORK'?'wo':'wo';const warn=(r.t==='WORK'&&sgsD.includes(r.d))?' <span class="tag wr">⚠ CONFLIT SGS</span>':'';const past=dTo(r.d)<0?'opacity:.4;':'';return '<div class="lr" style="'+past+'"><span class="d">'+r.d.slice(5).replace('-','/')+'</span><span style="flex:1">'+r.l+warn+'</span><span class="tag '+cls+'">'+r.t+'</span></div>'}).join('')||'<div class="sub">Rien à venir.</div>';},
+addFin(){const a=parseFloat($('#fin-amt').value);if(!a)return;S.fin.push({amt:a,cat:$('#fin-cat').value,d:TODAY});save();$('#fin-amt').value='';this.fin();this.today();},
+fin(){$('#fin-list').innerHTML=S.fin.slice(-6).reverse().map(f=>'<div class="lr"><span class="d">'+f.d.slice(5).replace('-','/')+'</span><span style="flex:1">'+f.cat+'</span><span style="color:'+(f.cat==='DÉPENSE'?'var(--red)':'var(--grn)')+';font-weight:800">'+(f.cat==='DÉPENSE'?'-':'+')+f.amt+'€</span></div>').join('')||'<div class="sub">Journal vide.</div>';},
+saveKPI(){const v={dw:+$('#k-dw').value||0,sl:+$('#k-sl').value||0,z2:+$('#k-z2').value||0,lg:+$('#k-lg').value||0,pg:+$('#k-pg').value||0};let sc=0;if(v.dw>=15)sc++;if(v.sl>=8)sc++;if(v.z2>=150)sc++;if(v.lg>=5)sc++;if(v.pg>=200)sc++;S.kpi.push(Object.assign({d:TODAY,score:sc},v));save();['k-dw','k-sl','k-z2','k-lg','k-pg'].forEach(i=>$('#'+i).value='');this.kpiHist();alert('SEMAINE ENREGISTRÉE · SCORE '+sc+'/5'+(sc<4?' · vigilance DECISA':''));},
+kpiHist(){$('#kpi-hist').innerHTML=S.kpi.slice(-4).reverse().map(k=>'<div class="lr"><span class="d">'+k.d.slice(5).replace('-','/')+'</span><span style="flex:1">DW '+k.dw+'h · som '+k.sl+' · Z2 '+k.z2+'min</span><span class="tag '+(k.score>=4?'ok':'wr')+'">'+k.score+'/5</span></div>').join('');},
+backup(){try{navigator.clipboard.writeText(JSON.stringify(S)).then(()=>alert('JSON COPIÉ. Colle-le dans une note sécurisée.'))}catch(e){prompt('Copie manuelle :',JSON.stringify(S))}},
+restore(){const t=prompt('Colle le JSON :');if(!t)return;try{S=JSON.parse(t);save();location.reload()}catch(e){alert('JSON invalide.')}},
+decisa(o){$('#ovl').classList.toggle('on',!!o)}};
+window.onload=()=>app.init();
+</script>
+</body>
+</html>
